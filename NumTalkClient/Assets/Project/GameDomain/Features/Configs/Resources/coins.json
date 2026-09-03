@@ -1,0 +1,9 @@
+{
+  "pickup_size_px": 4,
+  "location_spawn": {
+    "ahead_px": 300,
+    "min_gap_px": 60,
+    "max_gap_px": 180,
+    "value": 1
+  }
+}

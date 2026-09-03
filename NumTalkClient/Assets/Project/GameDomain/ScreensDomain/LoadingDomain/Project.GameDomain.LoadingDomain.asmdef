@@ -1,0 +1,18 @@
+{
+  "name": "Project.GameDomain.LoadingDomain",
+  "rootNamespace": "",
+  "references": [
+    "GUID:9cadf8c347ec04e9499ce0cda591b607",
+    "GUID:f51ebe6a0ceec4240a699833d6309b23",
+    "GUID:b0214a6008ed146ff8f122a6a9c2f6cc"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

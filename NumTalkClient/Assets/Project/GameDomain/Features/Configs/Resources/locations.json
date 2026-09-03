@@ -1,0 +1,13 @@
+{
+  "initial": "Hellscape",
+  "locations": [
+    {
+      "location_type": "Hellscape",
+      "gravity": 9.8
+    },
+    {
+      "location_type": "Hellscape",
+      "gravity": 9.8
+    }
+  ]
+}

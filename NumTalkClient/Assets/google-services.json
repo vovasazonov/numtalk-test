@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "44190567377",
+    "project_id": "idle-c6312",
+    "storage_bucket": "idle-c6312.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:44190567377:android:aff9f55b1d968355756ef0",
+        "android_client_info": {
+          "package_name": "com.osyacat.idle"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCEmLPrpolbW6cL9vcbg5eKpBRBfp_9HNk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
