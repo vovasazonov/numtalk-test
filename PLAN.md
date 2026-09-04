@@ -189,7 +189,7 @@ Task status uses standard Markdown checkboxes: change `- [ ]` to `- [x]` when th
 
 ### Priority A - delivery-critical MUST work
 
-- [ ] **A1 - Establish the platformer foundation.** Create feature folders, `PlatformerTuning.asset`, physics materials, named layers, and the clean 3D scene hierarchy described above.
+- [x] **A1 - Establish the platformer foundation.** Create feature folders, `PlatformerTuningConfig.asset`, physics materials, named layers, and the clean 3D scene hierarchy described above.
 - [ ] **A2 - Preserve scene authoring during ECS bake.** Replace destructive scene conversion with retained `SyncWithEntity` conversion; verify every authored gameplay object creates exactly one linked Arch entity and no duplicate `EntityView` visual.
 - [ ] **A3 - Build the full primitive blockout.** Place player spawn, platforms, gaps, hazards, checkpoints, crate route, enemies, coins, and goal in the Unity Scene view. Every interactive object has its semantic baker/authoring component.
 - [ ] **A4 - Establish fixed-step ECS scheduling.** Register simulation systems in `SystemRunner.FixedUpdate`, presentation systems separately, and input edges as latches consumed by the next simulation tick.

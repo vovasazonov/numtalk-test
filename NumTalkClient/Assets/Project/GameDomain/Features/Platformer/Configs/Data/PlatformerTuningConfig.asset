@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 61b111704c89345f5bebfc7df3150322, type: 3}
+  m_Name: PlatformerTuningConfig
+  m_EditorClassIdentifier: Project.GameDomain::Project.GameDomain.Features.Platformer.Configs.Scripts.PlatformerTuning
+  MaximumRunSpeed: 7.5
+  GroundAcceleration: 60
+  GroundDeceleration: 70
+  AirAccelerationScale: 0.55
+  TargetJumpApexHeight: 2.6
+  AscentGravity: 24
+  FallGravityMultiplier: 1.7
+  EarlyReleaseVelocityCut: 0.45
+  TerminalFallSpeed: 32
+  CoyoteTime: 0.11
+  JumpBufferTime: 0.14
+  IceDecelerationScale: 0.1
+  CrumbleTelegraphTime: 0.35
+  CrumbleFallDelay: 0.55
+  CrumbleRespawnTime: 3
+  CrateMass: 6
+  CratePushAcceleration: 18
+  KnockbackSpeed: 9
+  AirborneKnockbackHalfLife: 0.28
+  GroundedKnockbackHalfLife: 0.16
+  StompBounceSpeed: 6.5
+  HeldJumpStompBounceSpeed: 8.25
+  FollowDamping: 8
+  VelocityLeadTime: 0.18
+  AirborneVerticalDamping: 4
+  LandingSquashDuration: 0.12
+  PickupPopDuration: 0.18
