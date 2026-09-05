@@ -12,10 +12,14 @@ namespace Project.GameDomain.Features.PlayerInput.Scripts
     /// </summary>
     public static class PlayerInputInstaller
     {
-        /// <summary>Render frame: sample the thumbs and latch their edges for the next fixed tick.</summary>
+        /// <summary>Render frame: sample the thumbs and the keyboard, and latch their edges for the next fixed tick.</summary>
         public static void InstallSampling(IContainerBuilder builder)
         {
-            builder.Register<TouchPlayerInputService>(Lifetime.Singleton).AsSelf().As<IPlayerInputSource>();
+            builder.Register<TouchPlayerInputService>(Lifetime.Singleton).AsSelf();
+            builder.Register<KeyboardPlayerInputService>(Lifetime.Singleton).AsSelf();
+            builder.Register<IPlayerInputSource>(resolver => new CompositePlayerInputSource(
+                resolver.Resolve<TouchPlayerInputService>(),
+                resolver.Resolve<KeyboardPlayerInputService>()), Lifetime.Singleton);
             builder.RegisterComponentInHierarchy<TouchControlsView>().AsImplementedInterfaces();
             builder.RegisterSystemIntoArchApp<InputLatchSystem>(SystemRunner.Update);
         }
