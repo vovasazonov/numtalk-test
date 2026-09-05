@@ -1,5 +1,6 @@
 using Arch.Unity;
 using Arch.Unity.Toolkit;
+using Project.GameDomain.Features.Configs.Scripts;
 using Project.GameDomain.Features.PlayerInput.Scripts;
 using VContainer;
 
@@ -12,9 +13,10 @@ namespace Project.GameDomain.Scripts
     /// </summary>
     public static class GameplaySystemsInstaller
     {
-        public static void Install(IContainerBuilder builder)
+        public static void Install(IContainerBuilder builder, PlatformerTuningConfig tuning)
         {
-            builder.Register<NullPlayerInputSource>(Lifetime.Singleton).As<IPlayerInputSource>();
+            builder.RegisterInstance(tuning);
+            builder.Register<TouchPlayerInputSource>(Lifetime.Singleton).As<IPlayerInputSource>();
 
             InstallInputSampling(builder);
             InstallSimulation(builder);

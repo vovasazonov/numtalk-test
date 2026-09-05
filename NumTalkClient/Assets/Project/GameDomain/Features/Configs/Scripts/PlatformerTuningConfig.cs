@@ -46,6 +46,13 @@ namespace Project.GameDomain.Features.Configs.Scripts
         [Min(0f)] public float VelocityLeadTime = 0.18f;
         [Min(0f)] public float AirborneVerticalDamping = 4f;
 
+        [Header("Touch controls")]
+        [Tooltip("Touches at or right of this fraction of screen width are jump; left of it drive the stick.")]
+        [Range(0f, 1f)] public float JumpRegionScreenFraction = 0.5f;
+        [Tooltip("Thumb travel from the anchored centre that reads as full deflection, in inches.")]
+        [Min(0.01f)] public float StickMaximumRadiusInches = 0.32f;
+        [Min(0f)] public float StickDeadZoneInches = 0.04f;
+
         [Header("Feedback")]
         [Min(0f)] public float LandingSquashDuration = 0.12f;
         [Min(0f)] public float PickupPopDuration = 0.18f;

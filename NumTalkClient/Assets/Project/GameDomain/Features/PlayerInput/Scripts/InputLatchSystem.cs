@@ -25,6 +25,8 @@ namespace Project.GameDomain.Features.PlayerInput.Scripts
 
         public override void Update(in SystemState state)
         {
+            _source.Sample();
+
             _sampledMove = _source.Move;
             _sampledJumpHeld = _source.JumpHeld;
 

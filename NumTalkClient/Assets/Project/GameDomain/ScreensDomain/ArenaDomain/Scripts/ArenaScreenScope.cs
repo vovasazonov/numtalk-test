@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Project.CoreDomain.Screen;
 using Project.CoreDomain.VContainer;
 using Project.CoreDomain.View;
+using Project.GameDomain.Features.Configs.Scripts;
 using Project.GameDomain.Features.EcsArchitecture.Scripts;
 using Project.GameDomain.Scripts;
 using UnityEngine;
@@ -13,6 +14,7 @@ namespace Project.GameDomain.ScreensDomain.ArenaDomain.Scripts
     public class ArenaScreenScope : LifetimeScope
     {
         [SerializeField] private List<ScriptableInstaller> _installers;
+        [SerializeField] private PlatformerTuningConfig _tuning;
 
         protected override void Configure(IContainerBuilder builder)
         {
@@ -23,7 +25,7 @@ namespace Project.GameDomain.ScreensDomain.ArenaDomain.Scripts
             builder.Register<ViewService>(Lifetime.Singleton).AsImplementedInterfaces();
 
             EcsArchitectureInstaller.Install(builder);
-            GameplaySystemsInstaller.Install(builder);
+            GameplaySystemsInstaller.Install(builder, _tuning);
         }
     }
 }
