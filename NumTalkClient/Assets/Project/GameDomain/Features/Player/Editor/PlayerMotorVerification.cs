@@ -11,7 +11,7 @@ using Unity.Mathematics;
 using UnityEditor;
 using UnityEngine;
 
-namespace Project.GameDomain.Features.EcsArchitecture.Editor
+namespace Project.GameDomain.Features.Player.Editor
 {
     /// <summary>Repeatable A6 regression checks; temporary physics objects are always removed.</summary>
     public static class PlayerMotorVerification

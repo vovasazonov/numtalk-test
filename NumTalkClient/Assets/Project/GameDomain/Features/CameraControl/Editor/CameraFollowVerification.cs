@@ -5,7 +5,7 @@ using Unity.Mathematics;
 using UnityEditor;
 using UnityEngine;
 
-namespace Project.GameDomain.Features.EcsArchitecture.Editor
+namespace Project.GameDomain.Features.CameraControl.Editor
 {
     public static class CameraFollowVerification
     {

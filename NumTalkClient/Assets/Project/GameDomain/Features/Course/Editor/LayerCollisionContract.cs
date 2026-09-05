@@ -6,7 +6,7 @@ using Project.GameDomain.Features.Configs.Scripts;
 using UnityEditor;
 using UnityEngine;
 
-namespace Project.GameDomain.Features.EcsArchitecture.Editor
+namespace Project.GameDomain.Features.Course.Editor
 {
     /// <summary>
     /// A9: the single source of truth for the layer collision matrix. Apply writes it into Physics settings, Verify

@@ -17,7 +17,7 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace Project.GameDomain.Features.EcsArchitecture.Editor
+namespace Project.GameDomain.Features.Course.Editor
 {
     /// <summary>
     /// A8: measures the swept jump maximums with the shipping tuning asset, then checks every authored gap in

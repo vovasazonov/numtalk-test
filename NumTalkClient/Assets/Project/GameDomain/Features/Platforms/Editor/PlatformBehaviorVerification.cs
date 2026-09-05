@@ -11,7 +11,7 @@ using Unity.Mathematics;
 using UnityEditor;
 using UnityEngine;
 
-namespace Project.GameDomain.Features.EcsArchitecture.Editor
+namespace Project.GameDomain.Features.Platforms.Editor
 {
     /// <summary>A10 regression checks. Pure ECS, so no Unity physics objects are created.</summary>
     public static class PlatformBehaviorVerification
