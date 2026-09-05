@@ -44,6 +44,10 @@ namespace Project.GameDomain.Features.Configs.Scripts
         [Min(0f)] public float KnockbackSpeed = 9f;
         [Min(0f)] public float AirborneKnockbackHalfLife = 0.28f;
         [Min(0f)] public float GroundedKnockbackHalfLife = 0.16f;
+        [Min(0f)] public float ProjectileRadius = 0.18f;
+        [Min(0f)] public float ProjectileLifeTime = 4f;
+        [Tooltip("What a projectile sweep can hit. Enemy and EnemyProjectile are absent, so a shooter cannot hit itself or its own shots.")]
+        public LayerMask ProjectileHitMask = (1 << 8) | (1 << 9) | (1 << 10) | (1 << 11);
         [Min(0f)] public float StompBounceSpeed = 6.5f;
         [Min(0f)] public float HeldJumpStompBounceSpeed = 8.25f;
 

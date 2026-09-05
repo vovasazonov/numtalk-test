@@ -8,6 +8,7 @@ using Project.GameDomain.Features.Player.Scripts;
 using Project.GameDomain.Features.Physics.Scripts;
 using Project.GameDomain.Features.Platforms.Scripts;
 using Project.GameDomain.Features.Pushables.Scripts;
+using Project.GameDomain.Features.Enemies.Scripts;
 
 namespace Project.GameDomain.Scripts
 {
@@ -23,6 +24,7 @@ namespace Project.GameDomain.Scripts
             builder.RegisterInstance(tuning);
             builder.Register<CharacterMotionService>(Lifetime.Singleton);
             builder.Register<RigidBodyService>(Lifetime.Singleton);
+            builder.Register<ProjectilePool>(Lifetime.Singleton);
 
             PlayerInputInstaller.InstallSampling(builder);
             InstallSimulation(builder);
@@ -44,6 +46,10 @@ namespace Project.GameDomain.Scripts
             // After the motor, so the shove uses this tick's contacts and the read-back sees the resulting pose.
             builder.RegisterSystemIntoArchApp<CratePushSystem>(SystemRunner.FixedUpdate);
             builder.RegisterSystemIntoArchApp<PushableBodySystem>(SystemRunner.FixedUpdate);
+            // Enemies move first, then shoot from the pose they just reached, then this tick's projectiles sweep.
+            builder.RegisterSystemIntoArchApp<EnemyPatrolSystem>(SystemRunner.FixedUpdate);
+            builder.RegisterSystemIntoArchApp<ShooterSystem>(SystemRunner.FixedUpdate);
+            builder.RegisterSystemIntoArchApp<ProjectileSystem>(SystemRunner.FixedUpdate);
             PlayerInputInstaller.InstallLatchReset(builder);
         }
     }

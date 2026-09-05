@@ -18,5 +18,8 @@ namespace Project.GameDomain.Features.Enemies.Scripts
         public float ProjectileSpeed;
 
         public float Cooldown;
+
+        /// <summary>Counts down while the shot is telegraphed; the projectile leaves when it reaches zero.</summary>
+        public float WindUpTimer;
     }
 }
