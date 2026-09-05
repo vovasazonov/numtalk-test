@@ -35,7 +35,7 @@ namespace Project.GameDomain.ScreensDomain.ArenaDomain.Features.Ui.Editor
                 var go = new GameObject("StyledHud", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
                 go.transform.SetParent(root.transform, false);
                 go.GetComponent<Canvas>().renderMode = RenderMode.ScreenSpaceOverlay;
-                go.GetComponent<Canvas>().sortingOrder = 101;
+                go.GetComponent<Canvas>().sortingOrder = 2;
                 var scaler = go.GetComponent<CanvasScaler>();
                 scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
                 scaler.referenceResolution = new Vector2(1280, 720); scaler.matchWidthOrHeight = 0.5f;
