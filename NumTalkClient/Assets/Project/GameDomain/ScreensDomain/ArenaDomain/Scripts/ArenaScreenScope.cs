@@ -3,6 +3,7 @@ using Project.CoreDomain.Screen;
 using Project.CoreDomain.VContainer;
 using Project.CoreDomain.View;
 using Project.GameDomain.Features.EcsArchitecture.Scripts;
+using Project.GameDomain.Scripts;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -22,6 +23,7 @@ namespace Project.GameDomain.ScreensDomain.ArenaDomain.Scripts
             builder.Register<ViewService>(Lifetime.Singleton).AsImplementedInterfaces();
 
             EcsArchitectureInstaller.Install(builder);
+            GameplaySystemsInstaller.Install(builder);
         }
     }
 }
