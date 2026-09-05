@@ -79,7 +79,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: HOLD TO JUMP  /  SPACE
+  m_Text: HOLD TO JUMP
 --- !u!114 &3960902446113449260
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -484,7 +484,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: DRAG TO MOVE  /  WASD
+  m_Text: DRAG TO MOVE
 --- !u!114 &5004787645366808118
 MonoBehaviour:
   m_ObjectHideFlags: 0

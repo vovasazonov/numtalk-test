@@ -70,8 +70,8 @@ namespace Project.GameDomain.ScreensDomain.ArenaDomain.Features.Ui.Editor
             Label(canvas, "CourseTitle", "SKYBOUND", new Vector2(1, 1), new Vector2(-143, -40), new Vector2(230, 35), 28);
             var subtitle = Label(canvas, "CourseSubtitle", "THE FLOATING TRAIL", new Vector2(1, 1), new Vector2(-143, -68), new Vector2(230, 24), 13);
             subtitle.color = new Color(0.17f, 0.32f, 0.38f);
-            Label(canvas, "MoveHint", "DRAG TO MOVE  /  WASD", new Vector2(0, 0), new Vector2(165, 28), new Vector2(280, 30), 15);
-            Label(canvas, "JumpHint", "HOLD TO JUMP  /  SPACE", new Vector2(1, 0), new Vector2(-165, 28), new Vector2(280, 30), 15);
+            Label(canvas, "MoveHint", "DRAG TO MOVE", new Vector2(0, 0), new Vector2(165, 28), new Vector2(280, 30), 15);
+            Label(canvas, "JumpHint", "HOLD TO JUMP", new Vector2(1, 0), new Vector2(-165, 28), new Vector2(280, 30), 15);
             ConfigureCompletionPanel(panel);
             panel.SetActive(false);
             PrefabUtility.SaveAsPrefabAsset(root, path);
