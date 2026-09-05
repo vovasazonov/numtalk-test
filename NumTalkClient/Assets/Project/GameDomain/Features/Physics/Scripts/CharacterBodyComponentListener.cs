@@ -18,6 +18,8 @@ namespace Project.GameDomain.Features.Physics.Scripts
         private CharacterContactRelay _relay;
         private readonly List<CharacterContact> _contacts = new();
         private readonly List<CharacterSweepHit> _sweptHits = new();
+        private readonly Collider[] _overlaps = new Collider[16];
+        private readonly List<Entity> _overlapped = new();
         private Entity _entity;
         private bool _registered;
         public override IReadOnlyList<Type> RequiredRootComponents => RootComponents;
@@ -118,6 +120,27 @@ namespace Project.GameDomain.Features.Physics.Scripts
             }
 
             return _sweptHits;
+        }
+
+        /// <summary>
+        /// Entities whose trigger volumes the capsule is inside right now. Read every fixed step instead of relying
+        /// on OnTriggerEnter, so a checkpoint or a coin cannot be missed by a callback that fires between ticks.
+        /// </summary>
+        public IReadOnlyList<Entity> Overlap(int mask)
+        {
+            _overlapped.Clear();
+            float half = Mathf.Max(0f, _controller.height * 0.5f - _controller.radius);
+            Vector3 centre = _controller.transform.TransformPoint(_controller.center);
+            int count = UnityEngine.Physics.OverlapCapsuleNonAlloc(centre + Vector3.up * half, centre - Vector3.up * half,
+                _controller.radius, _overlaps, mask, QueryTriggerInteraction.Collide);
+
+            for (int index = 0; index < count; index++)
+            {
+                var view = _overlaps[index].GetComponentInParent<EntityView>();
+                if (view != null) _overlapped.Add(view.Entity);
+            }
+
+            return _overlapped;
         }
 
         /// <summary>Contacts from the last <see cref="Move"/>, as values. Unity objects stop here.</summary>

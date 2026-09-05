@@ -9,6 +9,7 @@ using Project.GameDomain.Features.Physics.Scripts;
 using Project.GameDomain.Features.Platforms.Scripts;
 using Project.GameDomain.Features.Pushables.Scripts;
 using Project.GameDomain.Features.Enemies.Scripts;
+using Project.GameDomain.Features.Course.Scripts;
 
 namespace Project.GameDomain.Scripts
 {
@@ -25,6 +26,7 @@ namespace Project.GameDomain.Scripts
             builder.Register<CharacterMotionService>(Lifetime.Singleton);
             builder.Register<RigidBodyService>(Lifetime.Singleton);
             builder.Register<ProjectilePool>(Lifetime.Singleton);
+            builder.Register<CourseSnapshotService>(Lifetime.Singleton);
 
             PlayerInputInstaller.InstallSampling(builder);
             InstallSimulation(builder);
@@ -52,6 +54,9 @@ namespace Project.GameDomain.Scripts
             builder.RegisterSystemIntoArchApp<ProjectileSystem>(SystemRunner.FixedUpdate);
             // After the motor, because the stomp is judged from the segment the player just travelled.
             builder.RegisterSystemIntoArchApp<StompSystem>(SystemRunner.FixedUpdate);
+            // Last, so a life lost this tick resolves after every system that could have taken it.
+            builder.RegisterSystemIntoArchApp<CourseTriggerSystem>(SystemRunner.FixedUpdate);
+            builder.RegisterSystemIntoArchApp<RespawnSystem>(SystemRunner.FixedUpdate);
             PlayerInputInstaller.InstallLatchReset(builder);
         }
     }

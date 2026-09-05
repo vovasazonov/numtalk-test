@@ -4,6 +4,7 @@ using Project.CoreDomain.VContainer;
 using Project.CoreDomain.View;
 using Project.GameDomain.Features.Configs.Scripts;
 using Project.GameDomain.Features.EcsArchitecture.Scripts;
+using Project.GameDomain.ScreensDomain.ArenaDomain.Features.Ui.Scripts;
 using Project.GameDomain.Scripts;
 using UnityEngine;
 using VContainer;
@@ -15,6 +16,7 @@ namespace Project.GameDomain.ScreensDomain.ArenaDomain.Scripts
     {
         [SerializeField] private List<ScriptableInstaller> _installers;
         [SerializeField] private PlatformerTuningConfig _tuning;
+        [SerializeField] private ArenaHudView _hudView;
 
         protected override void Configure(IContainerBuilder builder)
         {
@@ -23,6 +25,9 @@ namespace Project.GameDomain.ScreensDomain.ArenaDomain.Scripts
             builder.Register<ArenaScreen>(Lifetime.Singleton).As<IScreen>();
             builder.Register<ArenaSceneLoader>(Lifetime.Singleton);
             builder.Register<ViewService>(Lifetime.Singleton).AsImplementedInterfaces();
+
+            builder.RegisterComponent(_hudView).As<IArenaHudView>();
+            builder.RegisterEntryPoint<ArenaHudPresenter>(Lifetime.Singleton);
 
             EcsArchitectureInstaller.Install(builder);
             GameplaySystemsInstaller.Install(builder, _tuning);

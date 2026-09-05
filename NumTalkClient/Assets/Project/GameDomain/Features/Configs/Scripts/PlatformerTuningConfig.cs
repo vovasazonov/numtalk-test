@@ -53,6 +53,10 @@ namespace Project.GameDomain.Features.Configs.Scripts
         [Min(0f)] public float StompBounceSpeed = 6.5f;
         [Min(0f)] public float HeldJumpStompBounceSpeed = 8.25f;
 
+        [Header("Checkpoints")]
+        [Tooltip("Trigger volumes the player's capsule is tested against: Pickup and KillZone.")]
+        public LayerMask TriggerContactMask = (1 << 14) | (1 << 15);
+
         [Header("Camera")]
         [Tooltip("Camera position relative to the follow anchor, in metres. Course forward is +Z.")]
         public Vector3 CourseCameraOffset = new(0f, 8f, -11f);

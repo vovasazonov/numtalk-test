@@ -91,6 +91,7 @@ namespace Project.GameDomain.Features.Enemies.Scripts
                 }
 
                 Hurt(hit, from, ref external);
+                World.Get<HealthComponent>(entity).PendingDamage++;
             }
         }
 

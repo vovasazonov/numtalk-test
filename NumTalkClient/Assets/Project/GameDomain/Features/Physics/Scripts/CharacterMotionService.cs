@@ -24,5 +24,6 @@ namespace Project.GameDomain.Features.Physics.Scripts
         public IReadOnlyList<CharacterSweepHit> Sweep(Entity entity, float3 from, float3 to, int mask, float skin)
             => _bodies[entity].Sweep(from, to, mask, skin);
         public float CapsuleBottomOffset(Entity entity) => _bodies[entity].CapsuleBottomOffset;
+        public IReadOnlyList<Entity> Overlap(Entity entity, int mask) => _bodies[entity].Overlap(mask);
     }
 }
