@@ -81,6 +81,8 @@ namespace Project.GameDomain.Features.Enemies.Scripts
             Entity target = view.Entity;
             if (!World.IsAlive(target) || !World.Has<ExternalVelocityComponent>(target)) return;
 
+            if (World.TryGet(target, out HealthComponent health) && health.IsProtected) return;
+
             float3 push = math.normalizesafe(new float3(direction.x, 0f, direction.z));
             // Replaced rather than accumulated, so a burst of shots cannot stack into an unrecoverable launch.
             World.Get<ExternalVelocityComponent>(target).Velocity = push * _tuning.KnockbackSpeed;

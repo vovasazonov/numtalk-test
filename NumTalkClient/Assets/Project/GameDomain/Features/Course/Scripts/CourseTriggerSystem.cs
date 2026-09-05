@@ -56,7 +56,7 @@ namespace Project.GameDomain.Features.Course.Scripts
 
         private void Read(Entity entity)
         {
-            if (!_motion.IsReady(entity)) return;
+            if (!_motion.IsReady(entity) || World.Get<HealthComponent>(entity).Phase == PlayerLifePhase.Dying) return;
 
             IReadOnlyList<Entity> overlapped = _motion.Overlap(entity, _tuning.TriggerContactMask);
             for (int index = 0; index < overlapped.Count; index++)
@@ -64,7 +64,11 @@ namespace Project.GameDomain.Features.Course.Scripts
                 Entity other = overlapped[index];
                 if (!World.IsAlive(other)) continue;
 
-                if (World.Has<KillZoneComponent>(other)) World.Get<HealthComponent>(entity).PendingDamage++;
+                if (World.Has<KillZoneComponent>(other))
+                {
+                    World.Get<HealthComponent>(entity).PendingDamage++;
+                    World.Get<HealthComponent>(entity).FellOutOfCourse = true;
+                }
                 if (World.Has<PickupComponent>(other)) Collect(other);
                 if (World.Has<CheckpointComponent>(other)) Activate(entity, other);
                 if (World.Has<GoalComponent>(other)) Finish(entity, other);

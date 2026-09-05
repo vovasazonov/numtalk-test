@@ -1,4 +1,5 @@
 using System;
+using Project.GameDomain.Features.Checkpoints.Scripts;
 using Arch.Core;
 using Project.GameDomain.Features.Course.Scripts;
 using Project.GameDomain.Features.Platforms.Scripts;
@@ -23,6 +24,29 @@ namespace Project.GameDomain.Features.Course.Editor
 
         [MenuItem("NumTalk/Preview/Shooter (Play Mode)")]
         public static void Shooter() => Place(new float3(-1f, 1.6f, 57f));
+
+        public static void CheckpointApproach(bool enter)
+        {
+            var world = ArenaWorld();
+            var query = new QueryDescription().WithAll<CheckpointComponent, EntityTransformComponent>();
+            float3 target = default;
+            int first = int.MaxValue;
+            world.Query(in query, (Entity e) =>
+            {
+                var marker = world.Get<CheckpointComponent>(e);
+                if (marker.Id >= first) return;
+                first = marker.Id;
+                target = world.Get<EntityTransformComponent>(e).Position;
+            });
+            Place(target + new float3(0, 0.1f, enter ? 0 : -3));
+        }
+
+        public static void LoseLife()
+        {
+            var world = ArenaWorld();
+            var query = new QueryDescription().WithAll<PlayerTagComponent, HealthComponent>();
+            world.Query(in query, (Entity e) => world.Get<HealthComponent>(e).PendingDamage++);
+        }
 
         private static World ArenaWorld()
         {
@@ -53,7 +77,7 @@ namespace Project.GameDomain.Features.Course.Editor
             var query = new QueryDescription().WithAll<PlayerTagComponent, EntityTransformComponent>();
             world.Query(in query, (Entity e) => report = $"Player {world.Get<EntityTransformComponent>(e).Position}; " +
                 $"grounded {world.Get<GroundStateComponent>(e).IsGrounded}; complete {world.Get<RunStateComponent>(e).IsComplete}; " +
-                $"lives {world.Get<HealthComponent>(e).Lives}. ");
+                $"lives {world.Get<HealthComponent>(e).Lives}; phase {world.Get<HealthComponent>(e).Phase}; timer {world.Get<HealthComponent>(e).PhaseRemaining:F2}. ");
             int warning = 0, frozen = 0;
             var weather = new QueryDescription().WithAll<FlashFreezeComponent>();
             world.Query(in weather, (Entity e) =>

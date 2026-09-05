@@ -6,6 +6,8 @@ namespace Project.GameDomain.Features.Player.Scripts
     public sealed class PlayerModelPresentation : ModelPresentationFeature
     {
         private bool _wasGrounded;
+        private PlayerLifePhase _lastLifePhase;
+        private int _respawnVersion;
         private float _previousVertical, _squashTime;
         private Quaternion _facing = Quaternion.identity;
 
@@ -21,6 +23,33 @@ namespace Project.GameDomain.Features.Player.Scripts
                 // The parent is the visual listener, not the collision/entity root.
                 transform.parent.position = Vector3.Lerp(motor.PreviousPosition, frame.Position, alpha)
                     + transform.parent.parent.TransformVector(shape.LocalOffset);
+            }
+            if (World.TryGet(Entity, out HealthComponent life))
+            {
+                if (life.Phase == PlayerLifePhase.Dying)
+                {
+                    if (_lastLifePhase != PlayerLifePhase.Dying)
+                        CourseEffects.Instance?.Burst(frame.Position + Vector3.up, new Color(1f, 0.3f, 0.2f), 20);
+                    float progress = Mathf.Clamp01(1f - life.PhaseRemaining / Tuning.DeathDuration);
+                    transform.rotation = _facing * Quaternion.Euler(0f, progress * 100f, Mathf.SmoothStep(0, 85, progress * 2));
+                    transform.localPosition = Vector3.up * (Mathf.Sin(progress * Mathf.PI) * 0.45f - progress * 0.25f);
+                    transform.localScale = Vector3.one * Mathf.Lerp(1f, 0.65f, progress);
+                    frame.AnimationState = 3;
+                    frame.Tint = Color.Lerp(new Color(1f, 0.25f, 0.2f), new Color(0.5f, 0.55f, 0.7f), progress);
+                    _lastLifePhase = life.Phase;
+                    return;
+                }
+                if (life.RespawnVersion != _respawnVersion)
+                {
+                    CourseEffects.Instance?.Burst(frame.Position + Vector3.up * 0.5f, new Color(0.4f, 1f, 1f), 28);
+                    _respawnVersion = life.RespawnVersion;
+                }
+                if (life.Phase == PlayerLifePhase.Respawning)
+                {
+                    frame.Visible = Mathf.FloorToInt(life.PhaseRemaining * 9f) % 2 == 0;
+                    frame.Tint = new Color(0.6f, 1f, 1f);
+                }
+                _lastLifePhase = life.Phase;
             }
             bool grounded = World.Get<GroundStateComponent>(Entity).IsGrounded;
             if (frame.Initialized && grounded && !_wasGrounded)
@@ -54,6 +83,8 @@ namespace Project.GameDomain.Features.Player.Scripts
         public override void ResetPresentation()
         {
             _wasGrounded = false;
+            _lastLifePhase = PlayerLifePhase.Alive;
+            _respawnVersion = 0;
             _previousVertical = _squashTime = 0f;
             _facing = Quaternion.identity;
         }

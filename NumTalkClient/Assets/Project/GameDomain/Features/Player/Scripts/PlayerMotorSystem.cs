@@ -29,6 +29,14 @@ namespace Project.GameDomain.Features.Player.Scripts
         private void Simulate(Entity entity)
         {
             if (!_motion.IsReady(entity)) return;
+            if (World.TryGet(entity, out HealthComponent life) &&
+                (life.Phase == PlayerLifePhase.Dying || (life.Phase == PlayerLifePhase.Respawning &&
+                 life.PhaseRemaining > _tuning.RespawnBlinkDuration - _tuning.RespawnCameraDuration)))
+            {
+                // Keep the physical capsule at the ECS respawn pose even while input is locked for the camera glide.
+                _motion.Move(entity, World.Get<EntityTransformComponent>(entity).Position, float3.zero, out _, out _);
+                return;
+            }
             ref var motor = ref World.Get<PlayerMotorComponent>(entity);
             ref var jump = ref World.Get<JumpStateComponent>(entity);
             ref var ground = ref World.Get<GroundStateComponent>(entity);

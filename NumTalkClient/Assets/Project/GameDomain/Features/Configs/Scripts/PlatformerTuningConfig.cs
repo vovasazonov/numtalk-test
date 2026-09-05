@@ -80,6 +80,11 @@ namespace Project.GameDomain.Features.Configs.Scripts
         [Min(0.01f)] public float StickMaximumRadiusInches = 0.32f;
         [Min(0f)] public float StickDeadZoneInches = 0.04f;
 
+        [Header("Life loss and respawn")]
+        [Min(0.1f)] public float DeathDuration = 2f;
+        [Min(0.1f)] public float RespawnBlinkDuration = 2f;
+        [Min(0.1f)] public float RespawnCameraDuration = 1.1f;
+
         [Header("Feedback")]
         [Min(0f)] public float LandingSquashDuration = 0.12f;
         [Min(0f)] public float PickupPopDuration = 0.18f;

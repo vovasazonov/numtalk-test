@@ -29,6 +29,12 @@ namespace Project.GameDomain.Features.CameraControl.Editor
                 Check(state.Anchor.y < 0 && state.Anchor.y > -3, "Falling below ground reference follows downward");
                 state.Step(new float3(50, 5, 50), float3.zero, true, 1f / 60f, tuning);
                 Check(math.distance(state.Anchor, new float3(50, 5, 50)) < 0.001f, "Teleport snaps");
+                state.BeginRespawn(1f);
+                float3 oldAnchor = state.Anchor;
+                state.Step(float3.zero, float3.zero, true, 1f / 60f, tuning);
+                Check(math.distance(state.Anchor, oldAnchor) < 1f && math.length(state.Anchor) > 1f, "Respawn camera snapped instead of gliding");
+                for (int i = 0; i < 60; i++) state.Step(float3.zero, float3.zero, true, 1f / 60f, tuning);
+                Check(math.length(state.Anchor) < 0.001f, "Respawn camera did not arrive");
                 state = default;
                 state.Step(float3.zero, new float3(100, 100, 0), true, 1f / 60f, tuning);
                 Check(math.abs(state.Anchor.x - tuning.MaximumCameraLead) < 0.001f && state.Anchor.y == 0,

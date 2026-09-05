@@ -19,6 +19,7 @@ namespace Project.GameDomain.Features.CameraControl.Scripts
         private Entity _target;
         private bool _found;
         private float _dt;
+        private int _respawnVersion;
 
         public CameraFollowSystem(World world, PlatformerTuningConfig tuning, CourseCameraPresentation presentation) : base(world)
         {
@@ -53,6 +54,11 @@ namespace Project.GameDomain.Features.CameraControl.Scripts
             float3 position = math.lerp(motor.PreviousPosition, pose.Position, alpha);
             // Actual swept displacement includes impulses and platform motion but excludes motion blocked by walls.
             float3 velocity = (pose.Position - motor.PreviousPosition) / Time.fixedDeltaTime;
+            if (World.TryGet(entity, out HealthComponent health) && health.RespawnVersion != _respawnVersion)
+            {
+                _respawnVersion = health.RespawnVersion;
+                _followState.BeginRespawn(_tuning.RespawnCameraDuration);
+            }
             _followState.Step(position, velocity, ground.IsGrounded, _dt, _tuning);
             _presentation.Apply(_followState.Anchor, _tuning);
         }

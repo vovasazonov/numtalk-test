@@ -51,6 +51,7 @@ namespace Project.GameDomain.Features.Course.Editor
                 VerifyCoinsSurviveRespawn(tuning);
                 VerifyCourseStateIsRestored(tuning);
                 VerifyThirdRestart(tuning);
+                VerifyProtection(tuning);
                 VerifyGoalAndRestartRequest(tuning);
 
                 return "A14 passed: three lives, a kill plane costing exactly one life per fall, a checkpoint that " +
@@ -144,6 +145,23 @@ namespace Project.GameDomain.Features.Course.Editor
             Check(world.LiveProjectiles == 0, "Projectiles in flight were not returned to the pool on respawn");
         }
 
+        private static void VerifyProtection(PlatformerTuningConfig tuning)
+        {
+            using var world = new Fixture(tuning);
+            world.AddKillZone(new float3(0f, -8f, 0f));
+            world.Kill(1);
+            world.DamageDuringProtection();
+            Check(world.Lives == 2, "Blink protection allowed another combat death");
+            world.Run(float2.zero, 58);
+            Check(world.Phase == PlayerLifePhase.Respawning, "Blink protection ended before two seconds");
+            world.Run(float2.zero, 3);
+            Check(world.Phase == PlayerLifePhase.Alive, "Blink protection never ended");
+            world.Kill(1);
+            world.PlacePlayer(new float3(0f, -8f, 0f));
+            world.Run(float2.zero, 1);
+            Check(world.Phase == PlayerLifePhase.Dying, "Falling out during protection stranded the player");
+        }
+
         /// <summary>Three complete restarts, each one landing on exactly the same course state as the first.</summary>
         private static void VerifyThirdRestart(PlatformerTuningConfig tuning)
         {
@@ -159,6 +177,7 @@ namespace Project.GameDomain.Features.Course.Editor
 
             for (int restart = 1; restart <= 3; restart++)
             {
+                world.WaitUntilReady();
                 world.Run(new float2(0f, 1f), 120);
                 world.Nudge(crate, new float3(0f, 0f, 6f));
                 world.Defeat(enemy);
@@ -216,6 +235,15 @@ namespace Project.GameDomain.Features.Course.Editor
             private readonly List<GameObject> _scratch = new();
             private readonly Dictionary<Entity, Rigidbody> _crates = new();
 
+            public PlayerLifePhase Phase => _world.Get<HealthComponent>(_player).Phase;
+            public void DamageDuringProtection()
+            {
+                for (int i = 0; i < 60; i++)
+                {
+                    _world.Get<HealthComponent>(_player).PendingDamage = 3;
+                    Run(float2.zero, 1);
+                }
+            }
             public int Lives => _world.Get<HealthComponent>(_player).Lives;
             public int CheckpointId => _world.Get<CheckpointReferenceComponent>(_player).CheckpointId;
             public float3 RespawnPosition => _world.Get<CheckpointReferenceComponent>(_player).RespawnPosition;
@@ -262,7 +290,7 @@ namespace Project.GameDomain.Features.Course.Editor
                     new ProjectileSystem(_world, _projectiles, tuning),
                     new StompSystem(_world, _motion, tuning),
                     new CourseTriggerSystem(_world, _motion, snapshots, tuning),
-                    new RespawnSystem(_world, snapshots),
+                    new RespawnSystem(_world, snapshots, tuning),
                 };
                 UnityEngine.Physics.SyncTransforms();
             }
@@ -382,14 +410,27 @@ namespace Project.GameDomain.Features.Course.Editor
             /// Dies in the kill plane the given number of times, stopping on the tick each death resolves so the
             /// restored state can be read before anything moves again.
             /// </summary>
+            public void WaitUntilReady()
+            {
+                for (int i = 0; i < 130 && _world.Get<HealthComponent>(_player).IsProtected; i++) Run(float2.zero, 1);
+            }
+
             public void Kill(int times)
             {
                 for (int death = 0; death < times; death++)
                 {
+                    while (_world.Get<HealthComponent>(_player).Phase == PlayerLifePhase.Respawning) Run(float2.zero, 1);
                     // Placed inside the kill volume, not above it: this is a death, not a fall.
                     PlacePlayer(new float3(0f, -8f, 0f));
                     int before = Lives;
                     for (int tick = 0; tick < 20 && Lives == before; tick++) Run(float2.zero, 1);
+                    Check(_world.Get<HealthComponent>(_player).Phase == PlayerLifePhase.Dying, "Death did not begin its animation phase");
+                    float3 deathPosition = PlayerPosition;
+                    Run(new float2(1, 1), 60);
+                    Check(math.distance(PlayerPosition, deathPosition) < 0.001f, "Dying player moved before respawn");
+                    Check(_world.Get<HealthComponent>(_player).Phase == PlayerLifePhase.Dying, "Death animation ended before two seconds");
+                    for (int tick = 0; tick < 65 && _world.Get<HealthComponent>(_player).Phase == PlayerLifePhase.Dying; tick++) Run(float2.zero, 1);
+                    Check(_world.Get<HealthComponent>(_player).Phase == PlayerLifePhase.Respawning, "Death did not transition to blinking respawn");
                 }
             }
 

@@ -12,6 +12,7 @@ namespace Project.GameDomain.Features.Presentation.Scripts
         public bool Initialized, Teleported;
         public Color Tint, Glow;
         public int AnimationState;
+        public bool Visible;
     }
 
     /// <summary>Feature-owned behavior attached to an art prefab; the pooled model owns its lifetime.</summary>

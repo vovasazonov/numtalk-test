@@ -7,12 +7,30 @@ namespace Project.GameDomain.Features.CameraControl.Scripts
     public struct CameraFollowState
     {
         public bool Initialized;
+        private float3 _respawnStart;
+        private float _respawnTime, _respawnDuration;
+
+        public void BeginRespawn(float duration)
+        {
+            _respawnStart = Anchor;
+            _respawnTime = 0f;
+            _respawnDuration = math.max(0.01f, duration);
+        }
         public float GroundHeight;
         public float3 Anchor;
         public float3 PreviousPlayerPosition;
 
         public void Step(float3 playerPosition, float3 velocity, bool grounded, float dt, PlatformerTuningConfig tuning)
         {
+            if (_respawnTime < _respawnDuration && Initialized)
+            {
+                _respawnTime = math.min(_respawnDuration, _respawnTime + math.max(0f, dt));
+                float t = _respawnTime / _respawnDuration;
+                Anchor = math.lerp(_respawnStart, playerPosition, t * t * (3f - 2f * t));
+                GroundHeight = playerPosition.y;
+                PreviousPlayerPosition = playerPosition;
+                return;
+            }
             bool snap = !Initialized || math.distance(playerPosition, PreviousPlayerPosition) > tuning.CameraTeleportDistance;
             if (snap) GroundHeight = playerPosition.y;
             else if (grounded) GroundHeight = playerPosition.y;

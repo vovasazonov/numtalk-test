@@ -61,7 +61,7 @@ namespace Project.GameDomain.Features.Enemies.Scripts
 
         private void Resolve(Entity entity)
         {
-            if (!_motion.IsReady(entity)) return;
+            if (!_motion.IsReady(entity) || World.Get<HealthComponent>(entity).IsProtected) return;
 
             ref var motor = ref World.Get<PlayerMotorComponent>(entity);
             if (!motor.HasSimulationPose) return;

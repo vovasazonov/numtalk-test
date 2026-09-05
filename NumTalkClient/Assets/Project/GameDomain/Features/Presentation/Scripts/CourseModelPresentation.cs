@@ -70,7 +70,7 @@ namespace Project.GameDomain.Features.Presentation.Scripts
             {
                 Position = pose, PreviousPosition = _lastPosition,
                 DeltaTime = dt, Time = Time.time, Initialized = _initialized, Teleported = teleported,
-                Tint = Color.white, Glow = Color.black, AnimationState = -1,
+                Tint = Color.white, Glow = Color.black, AnimationState = -1, Visible = true,
             };
             transform.localPosition = Vector3.zero;
             transform.localScale = Vector3.one;
@@ -79,6 +79,7 @@ namespace Project.GameDomain.Features.Presentation.Scripts
 
             for (int i = 0; i < _renderers.Length; i++)
             {
+                _renderers[i].forceRenderingOff = !frame.Visible;
                 _renderers[i].GetPropertyBlock(_properties);
                 _properties.SetColor(Emission, frame.Glow);
                 _properties.SetColor(BaseColor, _baseColors[i] * frame.Tint);
@@ -114,7 +115,7 @@ namespace Project.GameDomain.Features.Presentation.Scripts
             transform.localPosition = Vector3.zero;
             transform.localRotation = Quaternion.identity;
             transform.localScale = Vector3.one;
-            if (_renderers != null) foreach (var renderer in _renderers) renderer.SetPropertyBlock(null);
+            if (_renderers != null) foreach (var renderer in _renderers) { renderer.SetPropertyBlock(null); renderer.forceRenderingOff = false; }
         }
     }
 }
