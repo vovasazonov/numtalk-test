@@ -2,6 +2,16 @@
 
 Mobile-first 3D platformer prototype for the NumTalk Unity Developer Assignment, built with Unity `6000.5.0f1`, URP, and Arch ECS. Target: Android.
 
+## Preview
+
+[![Skybound gameplay preview](preview.jpg)](preview.mp4)
+
+[Watch the gameplay video](preview.mp4).
+
+## Download
+
+Download the Android APK from the [v1.0.0 release](https://github.com/vovasazonov/numtalk-test/releases/tag/1.0.0).
+
 ## Run
 
 1. Open `NumTalkClient` with Unity `6000.5.0f1` and allow package restoration and asset import to finish.
