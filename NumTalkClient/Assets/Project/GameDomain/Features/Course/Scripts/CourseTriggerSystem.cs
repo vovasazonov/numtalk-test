@@ -4,6 +4,7 @@ using Arch.Unity.Toolkit;
 using Project.GameDomain.Features.Checkpoints.Scripts;
 using Project.GameDomain.Features.Configs.Scripts;
 using Project.GameDomain.Features.EcsArchitecture.Scripts;
+using Project.GameDomain.Features.Goal.Scripts;
 using Project.GameDomain.Features.Hazards.Scripts;
 using Project.GameDomain.Features.Physics.Scripts;
 using Project.GameDomain.Features.Pickup.Scripts;
@@ -66,7 +67,15 @@ namespace Project.GameDomain.Features.Course.Scripts
                 if (World.Has<KillZoneComponent>(other)) World.Get<HealthComponent>(entity).PendingDamage++;
                 if (World.Has<PickupComponent>(other)) Collect(other);
                 if (World.Has<CheckpointComponent>(other)) Activate(entity, other);
+                if (World.Has<GoalComponent>(other)) Finish(entity, other);
             }
+        }
+
+        /// <summary>Reaching the flag ends the run; the overlay reads this and offers the restart.</summary>
+        private void Finish(Entity player, Entity goal)
+        {
+            World.Get<GoalComponent>(goal).IsReached = true;
+            World.Get<RunStateComponent>(player).IsComplete = true;
         }
 
         private void Collect(Entity coin)

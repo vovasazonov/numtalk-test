@@ -6,6 +6,7 @@ using Project.GameDomain.Features.Checkpoints.Scripts;
 using Project.GameDomain.Features.Configs.Scripts;
 using Project.GameDomain.Features.Course.Scripts;
 using Project.GameDomain.Features.EcsArchitecture.Scripts;
+using Project.GameDomain.Features.Goal.Scripts;
 using Project.GameDomain.Features.Enemies.Scripts;
 using Project.GameDomain.Features.Hazards.Scripts;
 using Project.GameDomain.Features.Physics.Scripts;
@@ -50,11 +51,13 @@ namespace Project.GameDomain.Features.Course.Editor
                 VerifyCoinsSurviveRespawn(tuning);
                 VerifyCourseStateIsRestored(tuning);
                 VerifyThirdRestart(tuning);
+                VerifyGoalAndRestartRequest(tuning);
 
                 return "A14 passed: three lives, a kill plane costing exactly one life per fall, a checkpoint that " +
                     "only moves forward and is resumed from, coins that stay collected across a respawn but come " +
                     "back on a restart, crate/platform/enemy state restored from the snapshot with projectiles " +
-                    "returned to the pool, and a third complete restart identical to the first.";
+                    "returned to the pool, a third complete restart identical to the first, and a goal that " +
+                    "completes the run and is cleared by the overlay's restart request.";
             }
             finally
             {
@@ -176,6 +179,29 @@ namespace Project.GameDomain.Features.Course.Editor
             }
         }
 
+        /// <summary>Reaching the flag ends the run, and the overlay's restart puts the course back to its start.</summary>
+        private static void VerifyGoalAndRestartRequest(PlatformerTuningConfig tuning)
+        {
+            using var world = new Fixture(tuning);
+            world.AddCheckpoint(id: 1, new float3(0f, 0.5f, 3f));
+            Entity coin = world.AddCoin(new float3(0f, 0.5f, 5f));
+            Entity goal = world.AddGoal(new float3(0f, 0.5f, 8f));
+
+            for (int tick = 0; tick < 240 && !world.IsComplete; tick++) world.Run(new float2(0f, 1f), 1);
+
+            Check(world.IsReached(goal), "Reaching the flag did not mark the goal");
+            Check(world.IsComplete, "Reaching the flag did not complete the run");
+            Check(world.IsCollected(coin), "The route to the goal did not pass the coin");
+
+            world.RequestRestart();
+            world.Run(float2.zero, 5);
+
+            Check(!world.IsComplete, "The restart request did not clear the finished run");
+            Check(world.CheckpointId == 0, "The restart did not clear the checkpoint reference");
+            Check(!world.IsCollected(coin), "The restart did not return the coin to the course");
+            Check(world.Lives == 3, $"The restart left {world.Lives} lives instead of three");
+        }
+
         /// <summary>The player, a floor, and whatever course pieces a case needs, on the real system schedule.</summary>
         private sealed class Fixture : IDisposable
         {
@@ -216,7 +242,7 @@ namespace Project.GameDomain.Features.Course.Editor
 
                 _player = _world.Create(new PlayerTagComponent(), new PlayerMotorComponent(), new JumpStateComponent(),
                     new ExternalVelocityComponent(), new PlatformRiderComponent(), new PlayerInputComponent(),
-                    new GroundStateComponent(), new HealthComponent { Lives = 3, MaximumLives = 3 },
+                    new GroundStateComponent(), new HealthComponent { Lives = 3, MaximumLives = 3 }, new RunStateComponent(),
                     new CheckpointReferenceComponent { RespawnPosition = Origin },
                     new InitialStateComponent { Position = Origin, Rotation = quaternion.identity },
                     new EntityTransformComponent { Position = Origin, Rotation = quaternion.identity, Layer = PlayerLayer },
@@ -320,6 +346,21 @@ namespace Project.GameDomain.Features.Course.Editor
 
             public void Fire(float3 offset) => _projectiles.Rent(Origin + (Vector3)offset, new float3(0f, 0f, 4f),
                 _tuning.ProjectileRadius, _tuning.ProjectileLifeTime);
+
+            public bool IsComplete => _world.Get<RunStateComponent>(_player).IsComplete;
+            public bool IsReached(Entity goal) => _world.Get<GoalComponent>(goal).IsReached;
+
+            public Entity AddGoal(float3 offset)
+            {
+                Vector3 position = Origin + (Vector3)offset;
+                Entity goal = _world.Create(new GoalComponent(),
+                    new EntityTransformComponent { Position = position, Rotation = quaternion.identity, Layer = PickupLayer });
+
+                Trigger("Goal", PickupLayer, position, goal);
+                return goal;
+            }
+
+            public void RequestRestart() => _world.Get<RunStateComponent>(_player).RestartRequested = true;
 
             public bool IsActivated(Entity checkpoint) => _world.Get<CheckpointComponent>(checkpoint).IsActivated;
             public bool IsCollected(Entity coin) => _world.Get<PickupComponent>(coin).IsCollected;

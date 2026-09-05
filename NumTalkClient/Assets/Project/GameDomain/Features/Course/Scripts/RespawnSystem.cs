@@ -15,7 +15,7 @@ namespace Project.GameDomain.Features.Course.Scripts
         private readonly CourseSnapshotService _snapshots;
 
         private readonly QueryDescription _players = new QueryDescription()
-            .WithAll<PlayerTagComponent, HealthComponent, CheckpointReferenceComponent>();
+            .WithAll<PlayerTagComponent, HealthComponent, CheckpointReferenceComponent, RunStateComponent>();
 
         private readonly ForEach _resolve;
 
@@ -32,6 +32,16 @@ namespace Project.GameDomain.Features.Course.Scripts
 
         private void Resolve(Entity entity)
         {
+            ref var run = ref World.Get<RunStateComponent>(entity);
+            if (run.RestartRequested)
+            {
+                run = new RunStateComponent();
+                ref var restarting = ref World.Get<HealthComponent>(entity);
+                Restart(entity, ref restarting);
+                PlaceAtRespawn(entity);
+                return;
+            }
+
             ref var health = ref World.Get<HealthComponent>(entity);
             if (health.PendingDamage <= 0) return;
 
@@ -39,7 +49,11 @@ namespace Project.GameDomain.Features.Course.Scripts
             health.PendingDamage = 0;
             health.Lives--;
 
-            if (health.Lives <= 0) Restart(entity, ref health);
+            if (health.Lives <= 0)
+            {
+                World.Get<RunStateComponent>(entity) = new RunStateComponent();
+                Restart(entity, ref health);
+            }
             else _snapshots.RestoreCheckpoint();
 
             PlaceAtRespawn(entity);

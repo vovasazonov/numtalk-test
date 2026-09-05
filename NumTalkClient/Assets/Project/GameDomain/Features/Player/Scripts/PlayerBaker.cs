@@ -35,6 +35,7 @@ namespace Project.GameDomain.Features.Player.Scripts
             converter.AddComponent(new ExternalVelocityComponent());
             converter.AddComponent(new PlatformRiderComponent());
             converter.AddComponent(new HealthComponent { Lives = _lives, MaximumLives = _lives });
+            converter.AddComponent(new RunStateComponent());
             converter.AddComponent(new CheckpointReferenceComponent
             {
                 RespawnPosition = transform.position,

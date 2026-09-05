@@ -36,6 +36,8 @@ namespace Project.GameDomain.Features.Course.Editor
             "Platform_MovingIceCarry", "Platform_IceRun", "Platform_IceStep",
             "Platform_Crumble1", "Platform_Crumble2", "Platform_Crumble3", "Platform_CrumbleLanding",
             "Platform_FreezeRun1", "Platform_FreezeRun2", "Platform_FreezeRun3",
+            "Platform_FreezeRun4", "Platform_FreezeRun5", "Platform_FreezeRun6",
+            "Platform_FreezeRun7", "Platform_FreezeRun8",
             "Platform_MovingGoalFerry", "Platform_GoalApron",
         };
 

@@ -31,7 +31,7 @@ namespace Project.GameDomain.Features.Enemies.Scripts
         private readonly PlatformerTuningConfig _tuning;
 
         private readonly QueryDescription _players = new QueryDescription()
-            .WithAll<PlayerTagComponent, PlayerMotorComponent, CharacterBodyComponent>();
+            .WithAll<PlayerTagComponent, PlayerMotorComponent, CharacterBodyComponent, HealthComponent>();
 
         private readonly ForEach _resolve;
         private readonly List<Entity> _defeated = new();

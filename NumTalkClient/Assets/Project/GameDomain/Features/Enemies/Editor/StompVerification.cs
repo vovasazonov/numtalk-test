@@ -181,7 +181,7 @@ namespace Project.GameDomain.Features.Enemies.Editor
 
                 _player = _world.Create(new PlayerTagComponent(), new PlayerMotorComponent(), new JumpStateComponent(),
                     new ExternalVelocityComponent(), new PlatformRiderComponent(), new PlayerInputComponent(),
-                    new GroundStateComponent(),
+                    new GroundStateComponent(), new HealthComponent { Lives = 3, MaximumLives = 3 },
                     new EntityTransformComponent { Position = Origin, Rotation = quaternion.identity, Layer = PlayerLayer },
                     new CharacterBodyComponent
                     {
