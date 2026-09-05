@@ -20,7 +20,10 @@ namespace Project.GameDomain.Features.Player.Scripts
             float2 intent = input.Move / math.max(1f, math.length(input.Move));
             float3 target = (right * intent.x + forward * intent.y) * tuning.MaximumRunSpeed;
             float3 horizontal = new float3(motor.Velocity.x, 0f, motor.Velocity.z);
-            float acceleration = math.lengthsq(intent) > 0f ? tuning.GroundAcceleration : tuning.GroundDeceleration;
+            // Ice removes only deceleration, so intent still accelerates at full strength but momentum carries.
+            float acceleration = math.lengthsq(intent) > 0f
+                ? tuning.GroundAcceleration
+                : tuning.GroundDeceleration * (1f - rider.SurfaceSlip);
             acceleration *= grounded ? 1f : tuning.AirAccelerationScale;
             float3 difference = target - horizontal;
             horizontal += math.normalizesafe(difference) * math.min(math.length(difference), acceleration * dt);

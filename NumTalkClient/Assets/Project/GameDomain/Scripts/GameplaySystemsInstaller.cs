@@ -6,6 +6,7 @@ using Arch.Unity;
 using Arch.Unity.Toolkit;
 using Project.GameDomain.Features.Player.Scripts;
 using Project.GameDomain.Features.Physics.Scripts;
+using Project.GameDomain.Features.Platforms.Scripts;
 
 namespace Project.GameDomain.Scripts
 {
@@ -34,6 +35,9 @@ namespace Project.GameDomain.Scripts
         /// </summary>
         private static void InstallSimulation(IContainerBuilder builder)
         {
+            builder.RegisterSystemIntoArchApp<MovingPlatformSystem>(SystemRunner.FixedUpdate);
+            builder.RegisterSystemIntoArchApp<CrumblePlatformSystem>(SystemRunner.FixedUpdate);
+            builder.RegisterSystemIntoArchApp<PlatformRiderSystem>(SystemRunner.FixedUpdate);
             builder.RegisterSystemIntoArchApp<PlayerMotorSystem>(SystemRunner.FixedUpdate);
             PlayerInputInstaller.InstallLatchReset(builder);
         }

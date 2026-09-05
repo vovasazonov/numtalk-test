@@ -14,6 +14,16 @@ The runtime representation is rebuilt from that data by the existing view pipeli
 
 **Trade-off:** the authored look must survive as data, so shape, size, colour and collider volume are baked into components rather than kept as object references. The course is built from Unity primitives, which the brief requires anyway, so this is cheap. The cost is one extra GameObject per viewed component and an addressable load per listener type, paid once at level load.
 
+## 2b. Composable platform behavior - the timed fourth-behavior result
+
+`PlatformSurfaceComponent` is the only thing the player motor knows about a surface: a velocity to inherit and whether it is standable. Motion, ice, and crumble are independent components on the same entity, and `PlatformRiderSystem` is the single place that resolves whichever of them the player happens to be standing on into the rider's velocity channel and surface slip.
+
+To test the claim, I built the shared contract with Moving and Ice first, verified it, then timed adding Crumble as a fourth behavior on top. **It took 1 minute 28 seconds and passed on the first run.** The change was one new file, `CrumblePlatformSystem.cs`, plus one registration line in `GameplaySystemsInstaller`. No prefab forked, and `PlayerMotorSimulation`, `MovingPlatformSystem`, `PlatformRiderSystem`, and every platform component were untouched.
+
+That figure is agent-assisted time on an already-established contract, not a from-scratch human estimate, and `CrumbleStateComponent` and `CrumblePlatformBaker` already existed from the blockout task. The honest claim is about *blast radius*, not typing speed: a fourth behavior costs one system and one registration, which is exactly what the design promised.
+
+**Trade-off:** two behaviors can both want to write the platform's pose. I resolved it by precedence rather than by a general arbitration mechanism - a surface that has given way is owned by the crumble system, and `MovingPlatformSystem` yields on any platform that is no longer standable. That is one `if` instead of a scheduler, and it is verified by a test that runs both systems on a single moving-crumble entity.
+
 ## 3. GUI/UI architecture - MVP
 
 I still use **MVP** for UI. Views render the HUD and menus, presenters translate game state into display state, and ECS remains focused on the fixed-step gameplay simulation.

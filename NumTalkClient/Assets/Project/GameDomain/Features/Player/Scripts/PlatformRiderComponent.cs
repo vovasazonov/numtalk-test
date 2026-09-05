@@ -8,5 +8,11 @@ namespace Project.GameDomain.Features.Player.Scripts
     {
         public Entity Platform;
         public float3 SurfaceVelocity;
+
+        /// <summary>
+        /// How much of the rider's intrinsic deceleration the surface removes. 0 is normal ground and 1 is
+        /// frictionless, so the zero default is correct for a rider that is not standing on anything slick.
+        /// </summary>
+        public float SurfaceSlip;
     }
 }
