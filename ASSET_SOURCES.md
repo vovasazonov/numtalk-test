@@ -37,4 +37,6 @@ Only these source dependencies are referenced by the new course art. The OBJ, GL
 
 ### Project-authored work
 
+Derived art prefabs live in their owning feature folders (Player, Enemies, Platforms, Pickup, Checkpoints, Pushables and Goal). The shared atlas and license stay in Presentation. See [feature ownership](Documentation/FEATURE_OWNERSHIP.md) for the code and tool layout. Asset moves preserve their Unity GUIDs.
+
 The course layout, gameplay controller, ECS systems, primitive collision, normalized visual prefabs, URP material settings, freeze overlay, bounded particle effects, HUD layout and procedural heart icon are authored in this project. No third-party controller, code package or copied course layout is used. The builder is available at **NumTalk → Apply Kenney Visual Pass** in the Unity Editor.

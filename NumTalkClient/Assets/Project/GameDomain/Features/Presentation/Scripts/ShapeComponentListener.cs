@@ -1,7 +1,6 @@
 using Project.GameDomain.Features.EcsArchitecture.Scripts;
 using UnityEngine;
 using Arch.Core;
-using Project.GameDomain.Features.Player.Scripts;
 using System.Collections.Generic;
 
 namespace Project.GameDomain.Features.Presentation.Scripts
@@ -26,25 +25,12 @@ namespace Project.GameDomain.Features.Presentation.Scripts
         private Vector3 _localOffset;
         private World _world;
         private Entity _entity;
-        private bool _bound;
 
         public override void Sync(World world, Entity entity)
         {
             _world = world;
             _entity = entity;
-            _bound = true;
             base.Sync(world, entity);
-        }
-
-        private void LateUpdate()
-        {
-            if (!_bound || !_world.IsAlive(_entity) || !_world.Has<PlayerMotorComponent>(_entity)) return;
-            var motor = _world.Get<PlayerMotorComponent>(_entity);
-            if (!motor.HasSimulationPose) return;
-            var pose = _world.Get<EntityTransformComponent>(_entity);
-            float alpha = Mathf.Clamp01((float)((Time.timeAsDouble - Time.fixedTimeAsDouble) / Time.fixedDeltaTime));
-            transform.position = Vector3.Lerp(motor.PreviousPosition, pose.Position, alpha)
-                + transform.parent.TransformVector(_localOffset);
         }
 
         private MaterialPropertyBlock _propertyBlock;
@@ -120,7 +106,6 @@ namespace Project.GameDomain.Features.Presentation.Scripts
             _model = null;
             _appliedModel = CourseModel.Primitive;
             _meshRenderer.enabled = true;
-            _bound = false;
             transform.localPosition = Vector3.zero;
             _appliedShape = (PrimitiveShape)(-1);
             _appliedTint = Color.clear;

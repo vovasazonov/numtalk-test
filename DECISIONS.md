@@ -34,6 +34,12 @@ The payoff is that publishing the body's velocity as `PlatformSurfaceComponent.S
 
 **Trade-off:** a checkpoint restore has to teleport the crate rather than assign its pose, so `RigidBodyService.Teleport` is the single authorised override. Physics being authoritative also means the crate's pose lags ECS by one tick, which is invisible at 60 Hz and is the price of not having two writers.
 
+## 2d. Feature-owned presentation
+
+Player animation and landing feedback live in Player; enemy charge and defeat feedback live in Enemies; coin, platform and checkpoint views live beside their own gameplay components. The model prefabs carry these feature views. The shared Presentation layer binds their entity, blends animations, applies material output and manages pooled model lifetime, without inspecting gameplay-specific components.
+
+Course owns the visual catalog instance, atmosphere and course-wide authoring tools. Arena UI owns HUD authoring. The shared particle service emits a generic clear event; the platform-owned weather notice subscribes to it. The trade-off is explicit prefab binding for each visual feature, checked by `NumTalk/Verify Feature Presentation`, instead of one central class that knows every mechanic. Moves preserve the original asset GUIDs and addressable listener names.
+
 ## 3. GUI/UI architecture - MVP
 
 I still use **MVP** for UI. Views render the HUD and menus, presenters translate game state into display state, and ECS remains focused on the fixed-step gameplay simulation.

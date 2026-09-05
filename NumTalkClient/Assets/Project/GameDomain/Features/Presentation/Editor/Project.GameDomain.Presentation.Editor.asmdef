@@ -1,6 +1,0 @@
-{
-    "name": "Project.GameDomain.Presentation.Editor",
-    "references": ["Project.GameDomain", "Project.GameDomain.ArenaDomain", "Unity.ugui", "Arch.Unity", "VContainer"],
-    "includePlatforms": ["Editor"],
-    "autoReferenced": true
-}

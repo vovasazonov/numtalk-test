@@ -5618,6 +5618,7 @@ GameObject:
   m_Component:
   - component: {fileID: 650617572}
   - component: {fileID: 650617573}
+  - component: {fileID: 650617574}
   m_Layer: 0
   m_Name: CourseEffects
   m_TagString: Untagged
@@ -5655,6 +5656,18 @@ MonoBehaviour:
   m_Name:
   m_EditorClassIdentifier: Project.GameDomain::Project.GameDomain.Features.Presentation.Scripts.CourseEffects
   Particles: {fileID: 1456155403}
+--- !u!114 &650617574
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 650617571}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91efa4bebf9774fc9899ba9b7e049b38, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Project.GameDomain::Project.GameDomain.Features.Platforms.Scripts.FlashFreezeNotice
   WeatherLabel: {fileID: 1956683172}
 --- !u!1001 &661198139
 PrefabInstance:
@@ -9574,7 +9587,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0c76cba320da144ffaf1ab10e05712d1, type: 3}
   m_Name:
-  m_EditorClassIdentifier: Project.GameDomain::Project.GameDomain.Features.Presentation.Scripts.CourseAtmosphere
+  m_EditorClassIdentifier: Project.GameDomain::Project.GameDomain.Features.Course.Scripts.CourseAtmosphere
 --- !u!1 &1043364239
 GameObject:
   m_ObjectHideFlags: 0
