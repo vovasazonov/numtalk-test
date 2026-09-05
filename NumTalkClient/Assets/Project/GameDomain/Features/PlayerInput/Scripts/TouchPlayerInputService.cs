@@ -21,6 +21,10 @@ namespace Project.GameDomain.Features.PlayerInput.Scripts
 
         private readonly PlatformerTuningConfig _tuning;
 
+#if UNITY_EDITOR
+        private readonly bool _ownsTouchSimulation;
+#endif
+
         private int _stickTouchId = NoTouch;
         private int _jumpTouchId = NoTouch;
         private Vector2 _stickCenter;
@@ -48,16 +52,24 @@ namespace Project.GameDomain.Features.PlayerInput.Scripts
             _tuning = tuning;
 
 #if UNITY_EDITOR
-            // The mouse drives one simulated finger, so the controls can be exercised in the editor. One pointer
-            // cannot cover both thumbs at once; that case only holds up on a device.
-            TouchSimulation.Enable();
+            // With no touchscreen - a plain Game view - let the mouse drive one simulated finger so the controls
+            // can still be exercised. When something already provides one, such as the Device Simulator, leave it
+            // alone: a second touchscreen would win Touchscreen.current and report positions in the wrong space.
+            _ownsTouchSimulation = Touchscreen.current == null;
+            if (_ownsTouchSimulation)
+            {
+                TouchSimulation.Enable();
+            }
 #endif
         }
 
         public void Dispose()
         {
 #if UNITY_EDITOR
-            TouchSimulation.Disable();
+            if (_ownsTouchSimulation)
+            {
+                TouchSimulation.Disable();
+            }
 #endif
         }
 
