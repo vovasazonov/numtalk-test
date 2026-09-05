@@ -18,23 +18,22 @@ The repository is a Unity 6 project with Arch ECS, VContainer, UniTask, URP, and
 
 The existing `BakerComponent` uses `ConversionMode.ConvertAndDestroy`. That is appropriate for the existing runtime-view pipeline, but wrong for an authored 3D platformer course: it destroys the scene GameObject and therefore loses the visible collider/renderer/CharacterController that a level designer needs to see and edit.
 
-### Chosen model: ECS-owned game state with retained Unity authoring/physics objects
+### Chosen model: pure ECS state, runtime view rebuilt from baked data
 
-For the platformer course, replace the destructive baking path with a new `SceneEntityBaker` (or safely refactor `BakerComponent`) that calls Arch conversion using:
+`ArenaScene` stays authoring-only and the bake stays `ConvertAndDestroy`. Bakers implement `IComponentConverter` and serialise everything a system or view needs - pose, layer, primitive shape, size, tint, collider volume, body settings - into plain ECS data. No component holds a Unity object reference.
 
-```csharp
-ConversionMode = ConversionMode.SyncWithEntity;
-ConvertHybridComponents = false;
-```
+The runtime object is then rebuilt from that data by the existing view pipeline:
 
-Each authoring GameObject remains in the scene and receives Arch's `SyncWithEntity` link. Custom authoring components implement `IComponentConverter` and add plain, inspectable ECS data. A small bridge component explicitly holds references to the Unity `Transform`, `CharacterController`, `Rigidbody`, collider, or visual root required by a system. We will not add every arbitrary Unity component to the ECS world.
+- `ViewSystem` spawns one pooled `EntityView` root per entity carrying `ViewComponent`.
+- Each ECS component that needs a view gets its own `ComponentListener` child, addressable-loaded by type name.
+- Unity components that must live on the root are declared per listener via `RequiredRootComponents` and reference-counted by `EntityView`. The root adds one on first request and destroys it when the last requiring ECS component is removed, so several components can share one `Rigidbody`.
 
 This gives us both things we need:
 
-- **At edit time:** the hierarchy reads like a real level, with actual meshes, colliders, materials, and authoring components visible on the object they describe.
-- **At runtime:** Arch components are the authority for movement, health, platform state, projectiles, checkpoints, and game rules. Unity physics is used only for carefully bounded collision/sweep services and the dynamic crate.
+- **At edit time:** the hierarchy reads like a real level, with actual meshes, colliders, materials, and bakers visible on the object they describe.
+- **At runtime:** Arch components are the sole authority. Unity physics is a service the view layer assembles on demand from that data.
 
-Do not add `ViewComponent` to retained scene objects. The existing generic `EntityView`/listener pool remains suitable for pooled runtime effects or purely ECS-spawned items, but it must not create a duplicate visual for a scene-authored platform or player.
+Systems must never reach for a Unity object through `GetComponent`; they read and write ECS data, and listeners project it.
 
 ### System scheduling
 
@@ -67,25 +66,31 @@ ArenaScene
 `- MobileHud
 ```
 
-Every interactive object gets `SceneEntityBaker` plus a semantic authoring component. Its Inspector fields are the source of the initial ECS component values:
+Every interactive object gets `BakerComponent` plus a semantic baker. Its Inspector fields are the source of the initial ECS component values. Authoring components use the project's existing `XxxBaker` naming rather than `XxxAuthoring`, and the `CharacterController` / `Rigidbody` bridges are `[RequireComponent]` dependencies of the semantic baker rather than separate components to add by hand:
 
-| Scene object | Authoring component(s) | ECS data written by the baker |
-| --- | --- | --- |
-| Player capsule | `PlayerAuthoring`, `CharacterControllerBridge` | `PlayerTag`, `PlayerMotor`, `JumpState`, `GroundState`, `ExternalVelocity`, `PlatformRider`, `Health`, `CheckpointReference`, `SceneTransform` |
-| Static cube/platform | `PlatformAuthoring` | `PlatformSurface`, `SceneTransform`, `InitialState` |
-| Moving platform | `PlatformAuthoring`, `MovingPlatformAuthoring` | `PlatformSurface`, `PlatformMotion`, `InitialState` |
-| Ice platform | `PlatformAuthoring`, `IceSurfaceAuthoring` | `PlatformSurface`, `IceSurface` |
-| Crumble platform | `PlatformAuthoring`, `CrumblePlatformAuthoring` | `PlatformSurface`, `CrumbleState`, `InitialState` |
-| Crate | `PushableCrateAuthoring`, `RigidbodyBridge` | `Pushable`, `PlatformSurface`, `InitialState`, `SceneTransform` |
-| Patrol/stomp enemy | `EnemyAuthoring`, `PatrolAuthoring` | `Enemy`, `Patrol`, `StompTarget`, `InitialState` |
-| Shooter | `EnemyAuthoring`, `ShooterAuthoring` | `Enemy`, `Shooter`, `InitialState` |
-| Coin, checkpoint, kill zone, goal | matching authoring component | `Pickup`, `Checkpoint`, `KillZone`, or `Goal` plus stable ID/state |
+| Scene object | Prefab | Baker component(s) | ECS data written by the baker |
+| --- | --- | --- | --- |
+| Player capsule | `PlatformerPlayer` | `PlayerBaker`, `CharacterBodyBaker` | `PlayerTag`, `InitialState`, `PlayerMotor`, `JumpState`, `GroundState`, `ExternalVelocity`, `PlatformRider`, `Health`, `CheckpointReference`, `CharacterBody` |
+| Static cube/platform | `StaticPlatform` | `PlatformBaker` | `PlatformSurface`, `InitialState` |
+| Moving platform | `MovingPlatform` | `PlatformBaker`, `MovingPlatformBaker` | + `PlatformMotion` |
+| Ice platform | `IcePlatform` | `PlatformBaker`, `IceSurfaceBaker` | + `IceSurface` |
+| Moving ice platform | `MovingIcePlatform` | `PlatformBaker`, `MovingPlatformBaker`, `IceSurfaceBaker` | + `PlatformMotion`, `IceSurface` |
+| Crumble platform | `CrumblePlatform` | `PlatformBaker`, `CrumblePlatformBaker` | + `CrumbleState` |
+| Crate | `PushableCrate` | `PushableCrateBaker`, `PhysicsBodyBaker` | `Pushable`, `PlatformSurface`, `InitialState`, `PhysicsBody` |
+| Patrol/stomp enemy | `PatrolEnemy` | `EnemyBaker`, `PatrolBaker` | `Enemy`, `StompTarget`, `InitialState`, `Patrol` |
+| Shooter | `ShooterEnemy` | `EnemyBaker`, `ShooterBaker` | `Enemy`, `InitialState`, `Shooter` |
+| Coin | `Coin` | `CoinBaker` | `Pickup` (stable id), `InitialState` |
+| Checkpoint | `Checkpoint` | `CheckpointBaker` | `Checkpoint` (ordered id, respawn point) |
+| Kill zone | `KillZone` | `KillZoneBaker` | `KillZone` |
+| Goal | `Goal` | `GoalBaker` | `Goal` |
+
+Every object also carries `EntityTransformBaker` (pose, layer, `ViewComponent`), `ShapeBaker` (primitive, size, tint) and, where it has a collision volume, `PhysicsColliderBaker`. Those three are what let the runtime view rebuild the authored object after the scene GameObject is destroyed.
 
 The platform behavior model is intentionally compositional: `PlatformSurface` is the shared base data, while `MovingPlatform`, `IceSurface`, and `CrumbleState` are independent components on the same entity. No forked Moving/Ice/Crumble prefab families. Adding a fourth behavior later should be one authoring component, one ECS component, and one system - not a rewrite.
 
 ## 4. One tuning asset, measurable movement
 
-Create one `PlatformerTuning` ScriptableObject under a `Platformer/Configs` feature folder. All player, platform, crate, camera, combat, and feedback values live there, are labelled with units, and are referenced by the level authoring components/systems. No magic numbers in the motor.
+Create one `PlatformerTuning` ScriptableObject under the `Configs` feature folder. All player, platform, crate, camera, combat, and feedback values live there, are labelled with units, and are referenced by the level authoring components/systems. No magic numbers in the motor.
 
 Initial values are deliberately starting points, not final claims. Tune them on a device and publish the final values and measured maximums in the README.
 
@@ -191,7 +196,7 @@ Task status uses standard Markdown checkboxes: change `- [ ]` to `- [x]` when th
 
 - [x] **A1 - Establish the platformer foundation.** Create feature folders, `PlatformerTuningConfig.asset`, physics materials, named layers, and the clean 3D scene hierarchy described above.
 - [x] **A2 - NOT RELEVANT ANYMORE
-- [ ] **A3 - Build the full primitive blockout.** Place player spawn, platforms, gaps, hazards, checkpoints, crate route, enemies, coins, and goal in the Unity Scene view. Every interactive object has its semantic baker/authoring component.
+- [x] **A3 - Build the full primitive blockout.** Place player spawn, platforms, gaps, hazards, checkpoints, crate route, enemies, coins, and goal in the Unity Scene view. Every interactive object has its semantic baker/authoring component.
 - [ ] **A4 - Establish fixed-step ECS scheduling.** Register simulation systems in `SystemRunner.FixedUpdate`, presentation systems separately, and input edges as latches consumed by the next simulation tick.
 - [ ] **A5 - Implement two-thumb mobile input.** Deliver the left floating stick and right jump region with simultaneous pointers; validate it on an Android device before continuing.
 - [ ] **A6 - Implement the player motor.** Add camera-relative acceleration/deceleration, the three velocity channels, ground probe, variable jump, jump cut, coyote time, jump buffer, gravity split, terminal speed, and visual interpolation.

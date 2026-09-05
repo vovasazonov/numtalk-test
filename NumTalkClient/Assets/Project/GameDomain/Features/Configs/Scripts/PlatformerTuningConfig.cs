@@ -1,0 +1,53 @@
+using UnityEngine;
+
+namespace Project.GameDomain.Features.Configs.Scripts
+{
+    [CreateAssetMenu(fileName = "PlatformerTuningConfig", menuName = "NumTalk/Platformer Tuning")]
+    public sealed class PlatformerTuningConfig : ScriptableObject
+    {
+        [Header("Run (m/s, m/s²)")]
+        [Min(0f)] public float MaximumRunSpeed = 7.5f;
+        [Min(0f)] public float GroundAcceleration = 60f;
+        [Min(0f)] public float GroundDeceleration = 70f;
+        [Range(0f, 1f)] public float AirAccelerationScale = 0.55f;
+
+        [Header("Jump")]
+        [Tooltip("Target apex height in metres.")]
+        [Min(0f)] public float TargetJumpApexHeight = 2.6f;
+        [Tooltip("Upward gravity in m/s².")]
+        [Min(0f)] public float AscentGravity = 24f;
+        [Min(1f)] public float FallGravityMultiplier = 1.7f;
+        [Range(0f, 1f)] public float EarlyReleaseVelocityCut = 0.45f;
+        [Min(0f)] public float TerminalFallSpeed = 32f;
+
+        [Header("Forgiveness (seconds)")]
+        [Min(0f)] public float CoyoteTime = 0.11f;
+        [Min(0f)] public float JumpBufferTime = 0.14f;
+
+        [Header("Platforms")]
+        [Range(0f, 1f)] public float IceDecelerationScale = 0.10f;
+        [Min(0f)] public float CrumbleTelegraphTime = 0.35f;
+        [Min(0f)] public float CrumbleFallDelay = 0.55f;
+        [Min(0f)] public float CrumbleRespawnTime = 3f;
+
+        [Header("Crate")]
+        [Min(0f)] public float CrateMass = 6f;
+        [Min(0f)] public float CratePushAcceleration = 18f;
+
+        [Header("Combat")]
+        [Min(0f)] public float KnockbackSpeed = 9f;
+        [Min(0f)] public float AirborneKnockbackHalfLife = 0.28f;
+        [Min(0f)] public float GroundedKnockbackHalfLife = 0.16f;
+        [Min(0f)] public float StompBounceSpeed = 6.5f;
+        [Min(0f)] public float HeldJumpStompBounceSpeed = 8.25f;
+
+        [Header("Camera")]
+        [Min(0f)] public float FollowDamping = 8f;
+        [Min(0f)] public float VelocityLeadTime = 0.18f;
+        [Min(0f)] public float AirborneVerticalDamping = 4f;
+
+        [Header("Feedback")]
+        [Min(0f)] public float LandingSquashDuration = 0.12f;
+        [Min(0f)] public float PickupPopDuration = 0.18f;
+    }
+}

@@ -15,6 +15,9 @@ namespace Project.GameDomain.Features.EcsArchitecture.Scripts
         private readonly Dictionary<Type, IContentKeeper<ComponentListener>> _activeListeners = new();
         private readonly HashSet<Type> _pendingListeners = new();
 
+        private readonly Dictionary<Type, int> _rootComponentUsers = new();
+        private readonly HashSet<Type> _ownedRootComponents = new();
+
         public void Initialize(World world, Entity entity)
         {
             _world = world;
@@ -42,6 +45,7 @@ namespace Project.GameDomain.Features.EcsArchitecture.Scripts
                 else if (!hasComponent && isActive)
                 {
                     _activeListeners.Remove(componentType);
+                    ReleaseRootComponents(keeper.Value);
                     registry.Release(componentType, keeper);
                 }
             }
@@ -51,6 +55,7 @@ namespace Project.GameDomain.Features.EcsArchitecture.Scripts
         {
             foreach (KeyValuePair<Type, IContentKeeper<ComponentListener>> pair in _activeListeners)
             {
+                ReleaseRootComponents(pair.Value.Value);
                 registry.Release(pair.Key, pair.Value);
             }
 
@@ -71,10 +76,66 @@ namespace Project.GameDomain.Features.EcsArchitecture.Scripts
                 return;
             }
 
+            AcquireRootComponents(listener);
             listener.transform.SetParent(transform, false);
             listener.gameObject.SetActive(true);
             _activeListeners[componentType] = keeper;
             listener.Sync(_world, entity);
+        }
+
+        private void AcquireRootComponents(ComponentListener listener)
+        {
+            IReadOnlyList<Type> required = listener.RequiredRootComponents;
+            for (int index = 0; index < required.Count; index++)
+            {
+                Type type = required[index];
+                _rootComponentUsers.TryGetValue(type, out int users);
+                _rootComponentUsers[type] = users + 1;
+
+                bool isFirstUser = users == 0;
+                if (!isFirstUser || GetComponent(type) != null)
+                {
+                    continue;
+                }
+
+                gameObject.AddComponent(type);
+                _ownedRootComponents.Add(type);
+            }
+        }
+
+        private void ReleaseRootComponents(ComponentListener listener)
+        {
+            IReadOnlyList<Type> required = listener.RequiredRootComponents;
+            for (int index = 0; index < required.Count; index++)
+            {
+                Type type = required[index];
+                if (!_rootComponentUsers.TryGetValue(type, out int users))
+                {
+                    continue;
+                }
+
+                users--;
+                if (users > 0)
+                {
+                    _rootComponentUsers[type] = users;
+                    continue;
+                }
+
+                _rootComponentUsers.Remove(type);
+
+                bool isOwned = _ownedRootComponents.Remove(type);
+                if (!isOwned)
+                {
+                    continue;
+                }
+
+                UnityEngine.Component component = GetComponent(type);
+                if (component != null)
+                {
+                    // Immediate, so a view reused in the same frame does not see a component that is about to die.
+                    DestroyImmediate(component);
+                }
+            }
         }
     }
 }

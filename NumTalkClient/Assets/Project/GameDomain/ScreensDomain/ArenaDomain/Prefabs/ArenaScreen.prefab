@@ -48,5 +48,4 @@ MonoBehaviour:
     TypeName: 
   autoRun: 1
   autoInjectGameObjects: []
-  _installers:
-  - {fileID: 11400000, guid: 04b03501df9f3477283320fcb120a854, type: 2}
+  _installers: []
