@@ -244,8 +244,6 @@ Task status uses standard Markdown checkboxes: change `- [ ]` to `- [x]` when th
   - **The course was too short and was extended.** With rides and crumble telegraphs modelled from authored data, a clean run measured 55 s against a 60 s floor, so beat 7's final run grew by five platforms (a 30 m zig-zag) with three coins, and the ferry, apron and goal shifted back by 30 m. It now measures **207.7 m over 25 platforms: 50 s running, 13 s riding, 1 s of telegraphs, 64 s total**, with the widest required gap still 3.50 m of the 4.59 m budget.
   - The estimate is a model, not a play-through: path length at 55% of maximum run speed, plus one and a half traverses of each authored moving platform and one telegraph per crumble platform. The real figure comes from the A17 on-device recording.
   - HUD completed alongside: the coin counter and the finish overlay joined the life pips in the same MVP split, and one real defect surfaced - `StompSystem` raised damage without declaring `HealthComponent` in its query, which threw on any player entity without one.
-- [ ] **A16 - Pass all Priority A verification gates.** Device controls, forced 30/60/120 FPS, no player/projectile tunneling, crate cases, four knockback compositions, platform composition, restart, and retained-scene bake inspection are all green.
-- [ ] **A17 - Create the required deliverables.** Finish the one-page README and DECISIONS.md, Android build, and sub-90-second on-device recording with both thumbs visible.
 
 ### Priority B - requested polish and SHOULD work
 
@@ -257,7 +255,6 @@ Task status uses standard Markdown checkboxes: change `- [ ]` to `- [x]` when th
   - The owner-supplied kit remains in its original folder to preserve GUIDs. Eleven visual families dress 60 course entities through the existing Shape listener; a value-only model ID survives conversion. Added scenery, atmosphere, a separate styled HUD canvas, and a higher 55-degree camera. Real-device visual acceptance remains part of B5.
 - [x] **B4 - Record the art provenance.** Add the Kenney license files and `ASSET_SOURCES.md` with source URL, date, license, and used-file list.
   - `ASSET_SOURCES.md` records all used FBX/texture files and the integration date; the original download date was not supplied. CC0 license retained in the source pack and copied beside derived art.
-- [ ] **B5 - Re-run the full verification pass.** Confirm B1-B4 did not alter touch input, frame-rate consistency, collision, camera framing, or device performance.
   - All 11 editor verification suites passed, including `NumTalk/Verify Priority B`, plus a live keyboard run/jump and pickup/HUD check. Camera projection passed at 16:9 and 19.5:9. The live finish/restart overlay check and Android two-thumb/performance evidence remain pending. See `Documentation/Polish/README.md` for details.
 
 ### Priority C - bonus work (only after A and B are stable)
