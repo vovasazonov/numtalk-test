@@ -1,3 +1,4 @@
+using Project.GameDomain.Features.Audio.Scripts;
 using Project.GameDomain.Features.Presentation.Scripts;
 using UnityEngine;
 
@@ -23,6 +24,7 @@ namespace Project.GameDomain.Features.Checkpoints.Scripts
                 if (_observed && !_activated)
                 {
                     _activationTime = 1.1f;
+                    CourseAudio.Instance?.Play(CourseSound.Checkpoint);
                     CourseEffects.Instance?.Burst(frame.Position + Vector3.up, new Color(0.35f, 1f, 0.65f), 32);
                 }
             }

@@ -5619,6 +5619,7 @@ GameObject:
   - component: {fileID: 650617572}
   - component: {fileID: 650617573}
   - component: {fileID: 650617574}
+  - component: {fileID: 650617575}
   m_Layer: 0
   m_Name: CourseEffects
   m_TagString: Untagged
@@ -5669,6 +5670,24 @@ MonoBehaviour:
   m_Name:
   m_EditorClassIdentifier: Project.GameDomain::Project.GameDomain.Features.Platforms.Scripts.FlashFreezeNotice
   WeatherLabel: {fileID: 1956683172}
+--- !u!114 &650617575
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 650617571}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c22b3153fbe35455a9f7d38ab5fa0c6b, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Project.GameDomain::Project.GameDomain.Features.Audio.Scripts.CourseAudio
+  Music: {fileID: 8300000, guid: 217f6d17f79774c298ec9268350d9cdf, type: 3}
+  Coin: {fileID: 8300000, guid: 0fc64f722cf6547619360de30c3bba6c, type: 3}
+  Confirm: {fileID: 8300000, guid: 9e49417e0751448f39a6f39e22a21fb8, type: 3}
+  LifeLost: {fileID: 8300000, guid: 931e3bbe83da446f6af4c0bfab9fe229, type: 3}
+  MusicVolume: 0.16
+  EffectsVolume: 0.5
 --- !u!1001 &661198139
 PrefabInstance:
   m_ObjectHideFlags: 0

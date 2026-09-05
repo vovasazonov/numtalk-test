@@ -1,3 +1,4 @@
+using Project.GameDomain.Features.Audio.Scripts;
 using Project.GameDomain.Features.Presentation.Scripts;
 using UnityEngine;
 
@@ -29,7 +30,10 @@ namespace Project.GameDomain.Features.Player.Scripts
                 if (life.Phase == PlayerLifePhase.Dying)
                 {
                     if (_lastLifePhase != PlayerLifePhase.Dying)
+                    {
                         CourseEffects.Instance?.Burst(frame.Position + Vector3.up, new Color(1f, 0.3f, 0.2f), 20);
+                        CourseAudio.Instance?.Play(CourseSound.LifeLost);
+                    }
                     float progress = Mathf.Clamp01(1f - life.PhaseRemaining / Tuning.DeathDuration);
                     transform.rotation = _facing * Quaternion.Euler(0f, progress * 100f, Mathf.SmoothStep(0, 85, progress * 2));
                     transform.localPosition = Vector3.up * (Mathf.Sin(progress * Mathf.PI) * 0.45f - progress * 0.25f);

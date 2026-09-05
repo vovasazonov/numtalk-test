@@ -1,3 +1,4 @@
+using Project.GameDomain.Features.Audio.Scripts;
 using Project.GameDomain.Features.Presentation.Scripts;
 using UnityEngine;
 
@@ -14,7 +15,10 @@ namespace Project.GameDomain.Features.Pickup.Scripts
         public override void ReleaseFeedback()
         {
             if (World.TryGet(Entity, out PickupComponent pickup) && pickup.IsCollected)
+            {
                 CourseEffects.Instance?.Burst(transform.position, new Color(1f, 0.76f, 0.12f), 16);
+                CourseAudio.Instance?.Play(CourseSound.Coin);
+            }
         }
     }
 }
