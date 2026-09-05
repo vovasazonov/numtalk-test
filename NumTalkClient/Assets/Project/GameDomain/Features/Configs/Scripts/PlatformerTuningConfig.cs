@@ -48,6 +48,8 @@ namespace Project.GameDomain.Features.Configs.Scripts
         [Min(0f)] public float ProjectileLifeTime = 4f;
         [Tooltip("What a projectile sweep can hit. Enemy and EnemyProjectile are absent, so a shooter cannot hit itself or its own shots.")]
         public LayerMask ProjectileHitMask = (1 << 8) | (1 << 9) | (1 << 10) | (1 << 11);
+        [Tooltip("What the player's swept capsule tests for stomp and hurt contacts. Enemy only.")]
+        public LayerMask EnemyContactMask = 1 << 12;
         [Min(0f)] public float StompBounceSpeed = 6.5f;
         [Min(0f)] public float HeldJumpStompBounceSpeed = 8.25f;
 

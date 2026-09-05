@@ -17,6 +17,7 @@ namespace Project.GameDomain.Features.Physics.Scripts
         private CharacterController _controller;
         private CharacterContactRelay _relay;
         private readonly List<CharacterContact> _contacts = new();
+        private readonly List<CharacterSweepHit> _sweptHits = new();
         private Entity _entity;
         private bool _registered;
         public override IReadOnlyList<Type> RequiredRootComponents => RootComponents;
@@ -50,6 +51,9 @@ namespace Project.GameDomain.Features.Physics.Scripts
             _controller.minMoveDistance = 0f;
         }
 
+        /// <summary>Distance from the entity pose to the bottom of the capsule, so heights can be compared.</summary>
+        public float CapsuleBottomOffset => _controller.center.y - _controller.height * 0.5f;
+
         public bool Probe(float distance, int mask, out float3 normal, out Entity ground)
         {
             normal = math.up();
@@ -74,6 +78,46 @@ namespace Project.GameDomain.Features.Physics.Scripts
                 found = true;
             }
             return found;
+        }
+
+        /// <summary>
+        /// Sweeps the capsule over the segment the player actually travelled this step, from the pose it started
+        /// at. A swept query is the only thing that still sees a thin enemy at terminal speed on a long frame.
+        /// </summary>
+        /// <param name="skin">
+        /// Extra distance past the travelled segment, so a contact the controller already resolved - leaving its
+        /// skin-width gap, or blocking the step entirely - is still seen. A fully blocked step keeps falling, so
+        /// its direction is down.
+        /// </param>
+        public IReadOnlyList<CharacterSweepHit> Sweep(float3 from, float3 to, int mask, float skin)
+        {
+            _sweptHits.Clear();
+            float3 delta = to - from;
+            float distance = math.length(delta);
+            float3 direction = distance > 0.00001f ? delta / distance : new float3(0f, -1f, 0f);
+            distance += skin;
+
+            float half = Mathf.Max(0f, _controller.height * 0.5f - _controller.radius);
+            Vector3 centre = (Vector3)from + _controller.center;
+            int count = UnityEngine.Physics.CapsuleCastNonAlloc(centre + Vector3.up * half, centre - Vector3.up * half,
+                _controller.radius, (Vector3)direction, _hits, distance, mask, QueryTriggerInteraction.Ignore);
+
+            for (int index = 0; index < count; index++)
+            {
+                RaycastHit hit = _hits[index];
+                var view = hit.collider.GetComponentInParent<EntityView>();
+                if (view == null) continue;
+
+                _sweptHits.Add(new CharacterSweepHit
+                {
+                    Other = view.Entity,
+                    Normal = hit.normal,
+                    Point = hit.point,
+                    TopY = hit.collider.bounds.max.y,
+                });
+            }
+
+            return _sweptHits;
         }
 
         /// <summary>Contacts from the last <see cref="Move"/>, as values. Unity objects stop here.</summary>

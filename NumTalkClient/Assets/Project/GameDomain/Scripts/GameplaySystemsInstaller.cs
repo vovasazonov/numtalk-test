@@ -50,6 +50,8 @@ namespace Project.GameDomain.Scripts
             builder.RegisterSystemIntoArchApp<EnemyPatrolSystem>(SystemRunner.FixedUpdate);
             builder.RegisterSystemIntoArchApp<ShooterSystem>(SystemRunner.FixedUpdate);
             builder.RegisterSystemIntoArchApp<ProjectileSystem>(SystemRunner.FixedUpdate);
+            // After the motor, because the stomp is judged from the segment the player just travelled.
+            builder.RegisterSystemIntoArchApp<StompSystem>(SystemRunner.FixedUpdate);
             PlayerInputInstaller.InstallLatchReset(builder);
         }
     }

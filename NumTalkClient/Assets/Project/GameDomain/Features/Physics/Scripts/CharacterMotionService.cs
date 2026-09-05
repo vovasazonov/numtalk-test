@@ -21,5 +21,8 @@ namespace Project.GameDomain.Features.Physics.Scripts
         public float3 Move(Entity entity, float3 position, float3 displacement, out bool below, out bool above)
             => _bodies[entity].Move(position, displacement, out below, out above);
         public IReadOnlyList<CharacterContact> DrainContacts(Entity entity) => _bodies[entity].DrainContacts();
+        public IReadOnlyList<CharacterSweepHit> Sweep(Entity entity, float3 from, float3 to, int mask, float skin)
+            => _bodies[entity].Sweep(from, to, mask, skin);
+        public float CapsuleBottomOffset(Entity entity) => _bodies[entity].CapsuleBottomOffset;
     }
 }
