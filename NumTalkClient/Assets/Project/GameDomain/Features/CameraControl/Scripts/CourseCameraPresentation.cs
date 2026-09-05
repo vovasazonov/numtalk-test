@@ -15,6 +15,8 @@ namespace Project.GameDomain.Features.CameraControl.Scripts
         private Quaternion _originalRotation;
         private bool _originalOrthographic;
         private float _originalFieldOfView;
+        private Color _originalBackground;
+        private CameraClearFlags _originalClearFlags;
 
         public CourseCameraPresentation(ICameraService cameras) => _cameras = cameras;
 
@@ -30,8 +32,12 @@ namespace Project.GameDomain.Features.CameraControl.Scripts
                 _originalRotation = camera.transform.rotation;
                 _originalOrthographic = camera.orthographic;
                 _originalFieldOfView = camera.fieldOfView;
+                _originalBackground = camera.backgroundColor;
+                _originalClearFlags = camera.clearFlags;
             }
             camera.orthographic = false;
+            camera.clearFlags = CameraClearFlags.SolidColor;
+            camera.backgroundColor = new Color(0.62f, 0.81f, 0.88f);
             camera.fieldOfView = tuning.CourseCameraFieldOfView;
             Vector3 position = (Vector3)anchor + tuning.CourseCameraOffset;
             Vector3 focus = (Vector3)anchor + tuning.CourseCameraFocusOffset;
@@ -49,6 +55,8 @@ namespace Project.GameDomain.Features.CameraControl.Scripts
                 _camera.transform.SetPositionAndRotation(_originalPosition, _originalRotation);
                 _camera.orthographic = _originalOrthographic;
                 _camera.fieldOfView = _originalFieldOfView;
+                _camera.backgroundColor = _originalBackground;
+                _camera.clearFlags = _originalClearFlags;
                 _camera.ResetWorldToCameraMatrix();
                 _camera.ResetProjectionMatrix();
                 _camera.ResetCullingMatrix();

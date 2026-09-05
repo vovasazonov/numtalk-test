@@ -43,6 +43,7 @@ namespace Project.GameDomain.Scripts
         {
             builder.RegisterSystemIntoArchApp<MovingPlatformSystem>(SystemRunner.FixedUpdate);
             builder.RegisterSystemIntoArchApp<CrumblePlatformSystem>(SystemRunner.FixedUpdate);
+            builder.RegisterSystemIntoArchApp<FlashFreezeSystem>(SystemRunner.FixedUpdate);
             builder.RegisterSystemIntoArchApp<PlatformRiderSystem>(SystemRunner.FixedUpdate);
             builder.RegisterSystemIntoArchApp<PlayerMotorSystem>(SystemRunner.FixedUpdate);
             // After the motor, so the shove uses this tick's contacts and the read-back sees the resulting pose.

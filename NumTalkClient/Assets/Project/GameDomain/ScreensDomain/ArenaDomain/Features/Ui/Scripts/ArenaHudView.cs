@@ -36,7 +36,7 @@ namespace Project.GameDomain.ScreensDomain.ArenaDomain.Features.Ui.Scripts
             }
         }
 
-        public void SetCoins(int collected, int total) => _coinLabel.text = $"{collected} / {total}";
+        public void SetCoins(int collected, int total) => _coinLabel.text = $"COINS   {collected:00} / {total}";
 
         public void SetRunComplete(bool isComplete) => _completePanel.SetActive(isComplete);
 

@@ -101,10 +101,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ed1eff2aca0a2452498d3e88eb881aa0, type: 3}
-  m_Name: 
+  m_Name:
   m_EditorClassIdentifier: Project.GameDomain::Project.GameDomain.Features.Presentation.Scripts.ShapeComponentListener
   _meshFilter: {fileID: 4568451983493642828}
   _meshRenderer: {fileID: 6996012387578174952}
+  _catalog: {fileID: 11400000, guid: 315cf0a11befc43ac8deab56f0ab2bf1, type: 2}
   _cube: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
   _sphere: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
   _capsule: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}

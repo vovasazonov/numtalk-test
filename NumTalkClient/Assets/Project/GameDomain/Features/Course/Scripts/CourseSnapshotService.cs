@@ -37,6 +37,7 @@ namespace Project.GameDomain.Features.Course.Scripts
 
         private readonly QueryDescription _platforms = new QueryDescription().WithAll<PlatformMotionComponent>();
         private readonly QueryDescription _crumbles = new QueryDescription().WithAll<CrumbleStateComponent>();
+        private readonly QueryDescription _freezes = new QueryDescription().WithAll<FlashFreezeComponent>();
         private readonly QueryDescription _patrols = new QueryDescription().WithAll<PatrolComponent>();
         private readonly QueryDescription _shooters = new QueryDescription().WithAll<ShooterComponent>();
         private readonly QueryDescription _stompTargets = new QueryDescription().WithAll<StompTargetComponent>();
@@ -46,6 +47,7 @@ namespace Project.GameDomain.Features.Course.Scripts
         private readonly ForEach _capturePose;
         private readonly ForEach _capturePlatform;
         private readonly ForEach _captureCrumble;
+        private readonly ForEach _captureFreeze;
         private readonly ForEach _capturePatrol;
         private readonly ForEach _captureShooter;
         private readonly ForEach _captureStompTarget;
@@ -63,6 +65,7 @@ namespace Project.GameDomain.Features.Course.Scripts
             _capturePose = CapturePose;
             _capturePlatform = entity => _target.Platforms.Add((entity, _world.Get<PlatformMotionComponent>(entity)));
             _captureCrumble = entity => _target.Crumbles.Add((entity, _world.Get<CrumbleStateComponent>(entity)));
+            _captureFreeze = entity => _target.Freezes.Add((entity, _world.Get<FlashFreezeComponent>(entity)));
             _capturePatrol = entity => _target.Patrols.Add((entity, _world.Get<PatrolComponent>(entity)));
             _captureShooter = entity => _target.Shooters.Add((entity, _world.Get<ShooterComponent>(entity)));
             _captureStompTarget = entity => _target.StompTargets.Add((entity, _world.Get<StompTargetComponent>(entity)));
@@ -95,6 +98,7 @@ namespace Project.GameDomain.Features.Course.Scripts
             _world.Query(in _posed, _capturePose);
             _world.Query(in _platforms, _capturePlatform);
             _world.Query(in _crumbles, _captureCrumble);
+            _world.Query(in _freezes, _captureFreeze);
             _world.Query(in _patrols, _capturePatrol);
             _world.Query(in _shooters, _captureShooter);
             _world.Query(in _stompTargets, _captureStompTarget);
@@ -130,6 +134,7 @@ namespace Project.GameDomain.Features.Course.Scripts
 
             Write(snapshot.Platforms);
             Write(snapshot.Crumbles);
+            Write(snapshot.Freezes);
             Write(snapshot.Patrols);
             Write(snapshot.Shooters);
             Write(snapshot.StompTargets);

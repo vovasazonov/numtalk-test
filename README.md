@@ -1,6 +1,8 @@
-# NumTalk Platformer Prototype
+# Skybound — NumTalk Platformer
 
 Mobile-first 3D platformer prototype for the NumTalk Unity Developer Assignment.
+
+The Kenney visual pass adds floating islands, animated characters, feedback, and a telegraphed flash-freeze event. See [presentation notes and verification](Documentation/Polish/README.md) and [art provenance](ASSET_SOURCES.md).
 
 ## Project
 

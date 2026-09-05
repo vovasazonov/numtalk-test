@@ -44,6 +44,11 @@ namespace Project.GameDomain.Features.Platforms.Scripts
             {
                 rider.SurfaceSlip = 1f - ice.DecelerationScale;
             }
+            if (World.TryGet(ground.GroundEntity, out FlashFreezeComponent freeze)
+                && freeze.Phase == FlashFreezePhase.Frozen)
+            {
+                rider.SurfaceSlip = math.max(rider.SurfaceSlip, 1f - freeze.DecelerationScale);
+            }
         }
     }
 }

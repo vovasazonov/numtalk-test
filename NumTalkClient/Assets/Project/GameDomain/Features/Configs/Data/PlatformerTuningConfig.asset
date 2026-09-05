@@ -21,32 +21,48 @@ MonoBehaviour:
   FallGravityMultiplier: 1.7
   EarlyReleaseVelocityCut: 0.45
   TerminalFallSpeed: 32
+  CoyoteTime: 0.11
+  JumpBufferTime: 0.14
   GroundProbeDistance: 0.12
   GroundStickSpeed: 2
   MaximumInheritedPlatformSpeed: 12
   GroundProbeMask:
     serializedVersion: 2
     m_Bits: 3584
-  CoyoteTime: 0.11
-  JumpBufferTime: 0.14
   IceDecelerationScale: 0.1
   CrumbleTelegraphTime: 0.35
   CrumbleFallDelay: 0.55
   CrumbleRespawnTime: 3
+  FreezeWarningSeconds: 3
+  FreezeDurationSeconds: 12
   CrateMass: 6
   CratePushAcceleration: 18
   KnockbackSpeed: 9
   AirborneKnockbackHalfLife: 0.28
   GroundedKnockbackHalfLife: 0.16
+  ProjectileRadius: 0.18
+  ProjectileLifeTime: 4
+  ProjectileHitMask:
+    serializedVersion: 2
+    m_Bits: 3840
+  EnemyContactMask:
+    serializedVersion: 2
+    m_Bits: 4096
   StompBounceSpeed: 6.5
   HeldJumpStompBounceSpeed: 8.25
-  CourseCameraOffset: {x: 0, y: 8, z: -11}
-  CourseCameraFocusOffset: {x: 0, y: 1, z: 3}
-  CourseCameraFieldOfView: 60
+  TriggerContactMask:
+    serializedVersion: 2
+    m_Bits: 49152
+  CourseCameraOffset: {x: 0, y: 10, z: -13}
+  CourseCameraFocusOffset: {x: 0, y: 1, z: 4}
+  CourseCameraFieldOfView: 55
   MaximumCameraLead: 2
   CameraTeleportDistance: 12
   FollowDamping: 8
   VelocityLeadTime: 0.18
   AirborneVerticalDamping: 4
+  JumpRegionScreenFraction: 0.5
+  StickMaximumRadiusInches: 0.32
+  StickDeadZoneInches: 0.04
   LandingSquashDuration: 0.12
   PickupPopDuration: 0.18

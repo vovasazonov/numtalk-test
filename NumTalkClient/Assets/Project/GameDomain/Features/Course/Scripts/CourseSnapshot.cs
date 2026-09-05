@@ -19,6 +19,7 @@ namespace Project.GameDomain.Features.Course.Scripts
         public readonly List<(Entity Entity, float3 Position, quaternion Rotation)> Bodies = new();
         public readonly List<(Entity Entity, PlatformMotionComponent Value)> Platforms = new();
         public readonly List<(Entity Entity, CrumbleStateComponent Value)> Crumbles = new();
+        public readonly List<(Entity Entity, FlashFreezeComponent Value)> Freezes = new();
         public readonly List<(Entity Entity, PatrolComponent Value)> Patrols = new();
         public readonly List<(Entity Entity, ShooterComponent Value)> Shooters = new();
         public readonly List<(Entity Entity, StompTargetComponent Value)> StompTargets = new();
@@ -31,6 +32,7 @@ namespace Project.GameDomain.Features.Course.Scripts
             Bodies.Clear();
             Platforms.Clear();
             Crumbles.Clear();
+            Freezes.Clear();
             Patrols.Clear();
             Shooters.Clear();
             StompTargets.Clear();

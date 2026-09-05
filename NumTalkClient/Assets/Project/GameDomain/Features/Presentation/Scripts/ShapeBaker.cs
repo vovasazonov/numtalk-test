@@ -23,11 +23,13 @@ namespace Project.GameDomain.Features.Presentation.Scripts
             }
 
             Color tint = ReadTint(source);
+            var art = GetComponent<CourseVisualBaker>();
             converter.AddComponent(new ShapeComponent
             {
+                Model = art != null ? art.Model : CourseModel.Primitive,
                 Shape = ReadShape(source),
-                Size = source.transform.lossyScale,
-                LocalOffset = Quaternion.Inverse(transform.rotation) * (source.transform.position - transform.position),
+                Size = art != null ? art.Size : source.transform.lossyScale,
+                LocalOffset = art != null ? art.Offset : Quaternion.Inverse(transform.rotation) * (source.transform.position - transform.position),
                 Tint = new float4(tint.r, tint.g, tint.b, tint.a),
             });
         }

@@ -35,6 +35,8 @@ namespace Project.GameDomain.Features.Configs.Scripts
         [Min(0f)] public float CrumbleTelegraphTime = 0.35f;
         [Min(0f)] public float CrumbleFallDelay = 0.55f;
         [Min(0f)] public float CrumbleRespawnTime = 3f;
+        [Min(1f)] public float FreezeWarningSeconds = 3f;
+        [Min(1f)] public float FreezeDurationSeconds = 12f;
 
         [Header("Crate")]
         [Min(0f)] public float CrateMass = 6f;
@@ -59,10 +61,10 @@ namespace Project.GameDomain.Features.Configs.Scripts
 
         [Header("Camera")]
         [Tooltip("Camera position relative to the follow anchor, in metres. Course forward is +Z.")]
-        public Vector3 CourseCameraOffset = new(0f, 8f, -11f);
+        public Vector3 CourseCameraOffset = new(0f, 10f, -13f);
         [Tooltip("Look target relative to the follow anchor, in metres. Looks ahead to the next landing.")]
-        public Vector3 CourseCameraFocusOffset = new(0f, 1f, 3f);
-        [Range(30f, 90f)] public float CourseCameraFieldOfView = 60f;
+        public Vector3 CourseCameraFocusOffset = new(0f, 1f, 4f);
+        [Range(30f, 90f)] public float CourseCameraFieldOfView = 55f;
         [Tooltip("Maximum horizontal velocity lead, in metres.")]
         [Min(0f)] public float MaximumCameraLead = 2f;
         [Tooltip("Single-frame player displacement that snaps the camera after a respawn, in metres.")]

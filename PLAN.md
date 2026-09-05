@@ -249,11 +249,16 @@ Task status uses standard Markdown checkboxes: change `- [ ]` to `- [x]` when th
 
 ### Priority B - requested polish and SHOULD work
 
-- [ ] **B1 - Add the telegraphed sudden event.** Implement the flash-freeze section that visibly warns, temporarily converts selected surfaces to ice, and gives the player a fair response window.
-- [ ] **B2 - Add high-value feel feedback.** Add landing squash/stretch, coin pop, stomp bounce pop, crumble warning, shooter wind-up, and readable knockback without changing collision state.
-- [ ] **B3 - Apply the restrained CC0 visual pass.** Import only the selected Kenney models, keep primitive collision volumes, light the original floating-island course, and preserve platform readability on a phone screen.
-- [ ] **B4 - Record the art provenance.** Add the Kenney license files and `ASSET_SOURCES.md` with source URL, date, license, and used-file list.
+- [x] **B1 - Add the telegraphed sudden event.** Implement the flash-freeze section that visibly warns, temporarily converts selected surfaces to ice, and gives the player a fair response window.
+  - Eight final-run surfaces warn for 3 seconds at the safe checkpoint approach, freeze for 12 seconds, then thaw. Phase/timer are included in checkpoint snapshots; permanent ice and moving-platform carry remain independent. Warning and frozen states were captured in live Play mode.
+- [x] **B2 - Add high-value feel feedback.** Add landing squash/stretch, coin pop, stomp bounce pop, crumble warning, shooter wind-up, and readable knockback without changing collision state.
+  - Model-only animation, landing/stomp stretch, crumble pulse/shake, shooter charge and external-velocity hit flash. A bounded scene particle system handles pickup/stomp/landing bursts. Input and collider transforms are untouched by presentation.
+- [x] **B3 - Apply the restrained CC0 visual pass.** Import only the selected Kenney models, keep primitive collision volumes, light the original floating-island course, and preserve platform readability on a phone screen.
+  - The owner-supplied kit remains in its original folder to preserve GUIDs. Eleven visual families dress 60 course entities through the existing Shape listener; a value-only model ID survives conversion. Added scenery, atmosphere, a separate styled HUD canvas, and a higher 55-degree camera. Real-device visual acceptance remains part of B5.
+- [x] **B4 - Record the art provenance.** Add the Kenney license files and `ASSET_SOURCES.md` with source URL, date, license, and used-file list.
+  - `ASSET_SOURCES.md` records all used FBX/texture files and the integration date; the original download date was not supplied. CC0 license retained in the source pack and copied beside derived art.
 - [ ] **B5 - Re-run the full verification pass.** Confirm B1-B4 did not alter touch input, frame-rate consistency, collision, camera framing, or device performance.
+  - All 11 editor verification suites passed, including `NumTalk/Verify Priority B`, plus a live keyboard run/jump and pickup/HUD check. Camera projection passed at 16:9 and 19.5:9. The live finish/restart overlay check and Android two-thumb/performance evidence remain pending. See `Documentation/Polish/README.md` for details.
 
 ### Priority C - bonus work (only after A and B are stable)
 

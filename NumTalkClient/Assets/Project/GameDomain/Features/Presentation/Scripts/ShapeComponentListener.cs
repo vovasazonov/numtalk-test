@@ -2,6 +2,7 @@ using Project.GameDomain.Features.EcsArchitecture.Scripts;
 using UnityEngine;
 using Arch.Core;
 using Project.GameDomain.Features.Player.Scripts;
+using System.Collections.Generic;
 
 namespace Project.GameDomain.Features.Presentation.Scripts
 {
@@ -11,6 +12,10 @@ namespace Project.GameDomain.Features.Presentation.Scripts
     {
         [SerializeField] private MeshFilter _meshFilter;
         [SerializeField] private MeshRenderer _meshRenderer;
+        [SerializeField] private CourseVisualCatalog _catalog;
+        private readonly Dictionary<CourseModel, CourseModelPresentation> _models = new();
+        private CourseModelPresentation _model;
+        private CourseModel _appliedModel;
 
         [Header("Built-in primitive meshes")]
         [SerializeField] private Mesh _cube;
@@ -25,10 +30,10 @@ namespace Project.GameDomain.Features.Presentation.Scripts
 
         public override void Sync(World world, Entity entity)
         {
-            base.Sync(world, entity);
             _world = world;
             _entity = entity;
             _bound = true;
+            base.Sync(world, entity);
         }
 
         private void LateUpdate()
@@ -48,6 +53,7 @@ namespace Project.GameDomain.Features.Presentation.Scripts
 
         public override void UpdateView(in ShapeComponent component)
         {
+            ApplyModel(component.Model);
             transform.localScale = component.Size;
             _localOffset = component.LocalOffset;
             transform.localPosition = _localOffset;
@@ -71,6 +77,32 @@ namespace Project.GameDomain.Features.Presentation.Scripts
             _meshRenderer.SetPropertyBlock(_propertyBlock);
         }
 
+        private void ApplyModel(CourseModel model)
+        {
+            if (_appliedModel == model && (model == CourseModel.Primitive || _model != null)) return;
+            if (_model != null) _model.gameObject.SetActive(false);
+            _model = null;
+            _appliedModel = model;
+            if (model != CourseModel.Primitive && _catalog != null)
+            {
+                var entry = _catalog.Find(model);
+                if (entry.Prefab != null)
+                {
+                    if (!_models.TryGetValue(model, out _model))
+                    {
+                        var instance = Instantiate(entry.Prefab, transform);
+                        _model = instance.AddComponent<CourseModelPresentation>();
+                        _models.Add(model, _model);
+                    }
+                    _model.gameObject.SetActive(true);
+                    _model.Bind(_world, _entity, _catalog, entry);
+                }
+            }
+            _meshRenderer.enabled = _model == null;
+        }
+
+        public override void Release() => _model?.ReleaseFeedback();
+
         private Mesh ResolveMesh(PrimitiveShape shape)
         {
             return shape switch
@@ -84,6 +116,10 @@ namespace Project.GameDomain.Features.Presentation.Scripts
 
         private void OnDisable()
         {
+            if (_model != null) _model.gameObject.SetActive(false);
+            _model = null;
+            _appliedModel = CourseModel.Primitive;
+            _meshRenderer.enabled = true;
             _bound = false;
             transform.localPosition = Vector3.zero;
             _appliedShape = (PrimitiveShape)(-1);
