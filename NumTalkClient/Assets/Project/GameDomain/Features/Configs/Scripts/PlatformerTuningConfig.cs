@@ -48,6 +48,15 @@ namespace Project.GameDomain.Features.Configs.Scripts
         [Min(0f)] public float HeldJumpStompBounceSpeed = 8.25f;
 
         [Header("Camera")]
+        [Tooltip("Camera position relative to the follow anchor, in metres. Course forward is +Z.")]
+        public Vector3 CourseCameraOffset = new(0f, 8f, -11f);
+        [Tooltip("Look target relative to the follow anchor, in metres. Looks ahead to the next landing.")]
+        public Vector3 CourseCameraFocusOffset = new(0f, 1f, 3f);
+        [Range(30f, 90f)] public float CourseCameraFieldOfView = 60f;
+        [Tooltip("Maximum horizontal velocity lead, in metres.")]
+        [Min(0f)] public float MaximumCameraLead = 2f;
+        [Tooltip("Single-frame player displacement that snaps the camera after a respawn, in metres.")]
+        [Min(1f)] public float CameraTeleportDistance = 12f;
         [Min(0f)] public float FollowDamping = 8f;
         [Min(0f)] public float VelocityLeadTime = 0.18f;
         [Min(0f)] public float AirborneVerticalDamping = 4f;

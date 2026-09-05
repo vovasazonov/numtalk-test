@@ -1,6 +1,7 @@
 using Project.GameDomain.Features.Configs.Scripts;
 using Project.GameDomain.Features.PlayerInput.Scripts;
 using VContainer;
+using Project.GameDomain.Features.CameraControl.Scripts;
 using Arch.Unity;
 using Arch.Unity.Toolkit;
 using Project.GameDomain.Features.Player.Scripts;
@@ -22,6 +23,8 @@ namespace Project.GameDomain.Scripts
 
             PlayerInputInstaller.InstallSampling(builder);
             InstallSimulation(builder);
+            builder.Register<CourseCameraPresentation>(Lifetime.Singleton);
+            builder.RegisterSystemIntoArchApp<CameraFollowSystem>(SystemRunner.PreLateUpdate);
         }
 
         /// <summary>

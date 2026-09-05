@@ -40,6 +40,11 @@ MonoBehaviour:
   GroundedKnockbackHalfLife: 0.16
   StompBounceSpeed: 6.5
   HeldJumpStompBounceSpeed: 8.25
+  CourseCameraOffset: {x: 0, y: 8, z: -11}
+  CourseCameraFocusOffset: {x: 0, y: 1, z: 3}
+  CourseCameraFieldOfView: 60
+  MaximumCameraLead: 2
+  CameraTeleportDistance: 12
   FollowDamping: 8
   VelocityLeadTime: 0.18
   AirborneVerticalDamping: 4

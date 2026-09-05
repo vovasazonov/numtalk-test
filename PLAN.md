@@ -200,8 +200,9 @@ Task status uses standard Markdown checkboxes: change `- [ ]` to `- [x]` when th
 - [x] **A4 - Establish fixed-step ECS scheduling.** Register simulation systems in `SystemRunner.FixedUpdate`, presentation systems separately, and input edges as latches consumed by the next simulation tick.
 - [x] **A5 - Implement two-thumb mobile input.** Deliver the left floating stick and right jump region with simultaneous pointers; validate it on an Android device before continuing.
 - [x] **A6 - Implement the player motor.** Add camera-relative acceleration/deceleration, the three velocity channels, ground probe, variable jump, jump cut, coyote time, jump buffer, gravity split, terminal speed, and visual interpolation.
-  - Verification: Unity 6000.5.0f1 compile and normal EntryScene → Play → Arena smoke test passed; repeatable checks via `NumTalk/Verify Player Motor` cover jump forgiveness/expiry, acceleration and stopping, impulse decay, inheritance, swept wall/ceiling contacts, and ten thin-platform falls each with simulated 30/60/120 FPS tick grouping. See `A6_VERIFICATION.md` for evidence and remaining device gates.
-- [ ] **A7 - Implement readable third-person camera.** Add damping, velocity lead, ground-reference vertical follow, and baseline course framing that leaves the player and next commitment visible.
+  - Verification: Unity 6000.5.0f1 compile and normal EntryScene → Play → Arena smoke test passed; repeatable checks via `NumTalk/Verify Player Motor` cover jump forgiveness/expiry, acceleration and stopping, impulse decay, inheritance, swept wall/ceiling contacts, and ten thin-platform falls each with simulated 30/60/120 FPS tick grouping. Full device gates remain pending.
+- [x] **A7 - Implement readable third-person camera.** Add damping, velocity lead, ground-reference vertical follow, and baseline course framing that leaves the player and next commitment visible.
+  - Verification: `NumTalk/Verify Course Camera` passes jump-reference stability, landing/fall damping, teleport reset, bounded lead, 30/60/120 FPS damping, and player/apex/next-landing projection at 16:9 and 19.5:9. The normal EntryScene → Play flow and a live camera capture confirm perspective framing. Device feel remains for A16.
 - [ ] **A8 - Measure movement and resize the course.** Record preliminary maximum jump height/distance in scene and keep every gap at or below 75% of the measured horizontal limit.
 - [ ] **A9 - Enforce the layer collision contract.** Configure the full matrix, explicit masks on casts, and thin-platform player collision test; eliminate tag-based collision decisions.
 - [ ] **A10 - Build composable platform behavior.** Implement shared `PlatformSurface`, then Moving, Ice, and Crumble components/systems; prove Moving+Ice on one instance and record the fourth-behavior implementation time.
@@ -252,24 +253,24 @@ When Unity MCP access is available, use it to verify the loaded scene hierarchy 
 
 `DECISIONS.md` (one page) will contain the three hard calls and trade-offs: CharacterController plus ECS velocity channels, retained scene baking with Arch synchronization, and composable platform behavior. It will also state next controller work, the timed fourth-behavior result, and the required honest AI note: approximate generated/reworked share, one assistant error caught in this task, and one rejected suggestion with rationale.
 
-Commit after each meaningful accepted slice, for example:
+Commit after each meaningful accepted slice. Use only these subject prefixes: `Add`, `Remove`, `Update`, `Fix`, `Refactor`. Keep verification notes in this plan or the task response; do not create separate verification Markdown files. For example:
 
 ```text
-scaffold: add platformer tuning and layers
-ecs: retain scene authoring objects during bake
-scene: block out complete course and gameplay markers
-motor: fixed-step movement and forgiving jump
-input: dual-thumb floating stick controls
-camera: lead, damping, and occlusion handling
-platforms: compose moving ice and crumble surfaces
-collision: add physical crate and layer matrix
-combat: spherecast projectiles and external knockback
-combat: add swept stomp resolution
-run: checkpoints, lives, and clean restart
-course: author full mechanic sequence and goal
-polish: add feedback and CC0 environment dressing
-docs: add README decisions and asset ledger
-build: verify Android device recording
+Add: platformer tuning and layers
+Refactor: retain scene authoring objects during bake
+Add: block out complete course and gameplay markers
+Add: fixed-step movement and forgiving jump
+Add: dual-thumb floating stick controls
+Add: lead, damping, and occlusion handling
+Add: compose moving ice and crumble surfaces
+Add: physical crate and layer matrix
+Add: spherecast projectiles and external knockback
+Add: swept stomp resolution
+Add: checkpoints, lives, and clean restart
+Update: author full mechanic sequence and goal
+Update: add feedback and CC0 environment dressing
+Update: add README decisions and asset ledger
+Update: verify Android device recording
 ```
 
 ## 11. Cut order and definition of done
