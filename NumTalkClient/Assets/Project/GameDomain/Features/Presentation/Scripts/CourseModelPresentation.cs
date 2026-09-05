@@ -31,7 +31,7 @@ namespace Project.GameDomain.Features.Presentation.Scripts
             if (_baseColors == null)
             {
                 _baseColors = new Color[_renderers.Length];
-                for (int i = 0; i < _renderers.Length; i++) _baseColors[i] = _renderers[i].sharedMaterial.GetColor(BaseColor);
+                for (int i = 0; i < _renderers.Length; i++) _baseColors[i] = _renderers[i].sharedMaterial.HasProperty(BaseColor) ? _renderers[i].sharedMaterial.GetColor(BaseColor) : Color.white;
             }
             _properties ??= new MaterialPropertyBlock();
             _features ??= GetComponents<ModelPresentationFeature>();
@@ -77,9 +77,10 @@ namespace Project.GameDomain.Features.Presentation.Scripts
             foreach (var feature in _features) feature.Present(ref frame);
             if (frame.AnimationState >= 0) Animate(frame.AnimationState, dt);
 
-            _properties.SetColor(Emission, frame.Glow);
             for (int i = 0; i < _renderers.Length; i++)
             {
+                _renderers[i].GetPropertyBlock(_properties);
+                _properties.SetColor(Emission, frame.Glow);
                 _properties.SetColor(BaseColor, _baseColors[i] * frame.Tint);
                 _renderers[i].SetPropertyBlock(_properties);
             }

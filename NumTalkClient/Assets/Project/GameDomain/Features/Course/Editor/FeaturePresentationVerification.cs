@@ -26,6 +26,7 @@ namespace Project.GameDomain.Features.Course.Editor
             VerifyPlayer(catalog);
             VerifyPlatformComposition(catalog);
             VerifyOtherFeatures(catalog);
+            VerifyCheckpointGate(catalog);
             return "Feature presentation passed: owning prefab bindings, player animation/landing and interpolation without " +
                 "moving collision, frozen/crumble composition, pooled reset, shooter charge, coin rotation and checkpoint tint.";
         }
@@ -129,6 +130,35 @@ namespace Project.GameDomain.Features.Course.Editor
                 var checkpoint = model.AddComponent<CheckpointModelPresentation>(); checkpoint.Bind(world, marker, catalog.Tuning);
                 frame = Frame(Vector3.zero); checkpoint.Present(ref frame);
                 Check(frame.Glow.g > frame.Glow.r, "Activated checkpoint tint changed");
+            }
+            finally { UnityEngine.Object.DestroyImmediate(model); World.Destroy(world); }
+        }
+
+        private static void VerifyCheckpointGate(CourseVisualCatalog catalog)
+        {
+            var world = World.Create();
+            var model = UnityEngine.Object.Instantiate(catalog.Find(CourseModel.Checkpoint).Prefab);
+            try
+            {
+                Entity marker = world.Create(new CheckpointComponent());
+                var view = model.GetComponent<CheckpointModelPresentation>();
+                view.Bind(world, marker, catalog.Tuning);
+                var frame = Frame(new Vector3(10, 2, 5), false);
+                view.Present(ref frame);
+                Check(view.Gate.gameObject.activeSelf, "Unused checkpoint invitation missing");
+                Check(Vector3.Distance(view.Gate.position, frame.Position + Vector3.up * 1.1f) < 0.001f, "Gate does not mark trigger center");
+                world.Get<CheckpointComponent>(marker).IsActivated = true;
+                view.Present(ref frame);
+                Check(view.Gate.gameObject.activeSelf, "Activation should briefly keep the gate visible");
+                frame.DeltaTime = 1.2f;
+                view.Present(ref frame);
+                Check(!view.Gate.gameObject.activeSelf, "Activated gate did not fade away");
+                view.ResetPresentation();
+                view.Present(ref frame);
+                Check(!view.Gate.gameObject.activeSelf, "Pooling replayed checkpoint activation");
+                world.Get<CheckpointComponent>(marker).IsActivated = false;
+                view.Present(ref frame);
+                Check(view.Gate.gameObject.activeSelf, "Run restart did not restore checkpoint invitation");
             }
             finally { UnityEngine.Object.DestroyImmediate(model); World.Destroy(world); }
         }
