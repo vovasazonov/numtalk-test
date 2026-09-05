@@ -3,6 +3,9 @@ using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
+#if UNITY_EDITOR
+using UnityEngine.InputSystem.EnhancedTouch;
+#endif
 
 namespace Project.GameDomain.Features.PlayerInput.Scripts
 {
@@ -11,7 +14,7 @@ namespace Project.GameDomain.Features.PlayerInput.Scripts
     /// and its drag becomes the move vector; the first in the right region holds jump. Each thumb owns its touch id
     /// until that finger lifts, so the two operate concurrently and neither can steal the other's finger.
     /// </summary>
-    public sealed class TouchPlayerInputSource : IPlayerInputSource
+    public sealed class TouchPlayerInputSource : IPlayerInputSource, System.IDisposable
     {
         private const int NoTouch = 0;
         private const float FallbackScreenDpi = 160f;
@@ -26,9 +29,36 @@ namespace Project.GameDomain.Features.PlayerInput.Scripts
 
         public bool JumpHeld { get; private set; }
 
+        /// <summary>Screen-space stick state, for the on-screen control view. Only valid while <see cref="StickIsDown"/>.</summary>
+        public bool StickIsDown => _stickTouchId != NoTouch;
+
+        public Vector2 StickCenter => _stickCenter;
+
+        /// <summary>Thumb position clamped to the stick radius, so the drawn knob stops at the ring.</summary>
+        public Vector2 StickKnob { get; private set; }
+
+        public Vector2 JumpPosition { get; private set; }
+
+        public float StickRadiusPixels => _tuning.StickMaximumRadiusInches * ScreenDpi;
+
+        private static float ScreenDpi => Screen.dpi > 0f ? Screen.dpi : FallbackScreenDpi;
+
         public TouchPlayerInputSource(PlatformerTuningConfig tuning)
         {
             _tuning = tuning;
+
+#if UNITY_EDITOR
+            // The mouse drives one simulated finger, so the controls can be exercised in the editor. One pointer
+            // cannot cover both thumbs at once; that case only holds up on a device.
+            TouchSimulation.Enable();
+#endif
+        }
+
+        public void Dispose()
+        {
+#if UNITY_EDITOR
+            TouchSimulation.Disable();
+#endif
         }
 
         public void Sample()
@@ -66,6 +96,7 @@ namespace Project.GameDomain.Features.PlayerInput.Scripts
                 else if (touchId == _jumpTouchId)
                 {
                     jumpIsDown = true;
+                    JumpPosition = position;
                 }
                 else if (position.x < jumpRegionMinimumX)
                 {
@@ -73,12 +104,14 @@ namespace Project.GameDomain.Features.PlayerInput.Scripts
                     {
                         _stickTouchId = touchId;
                         _stickCenter = position;
+                        StickKnob = position;
                         stickIsDown = true;
                     }
                 }
                 else if (_jumpTouchId == NoTouch)
                 {
                     _jumpTouchId = touchId;
+                    JumpPosition = position;
                     jumpIsDown = true;
                 }
             }
@@ -108,6 +141,8 @@ namespace Project.GameDomain.Features.PlayerInput.Scripts
 
             Vector2 drag = position - _stickCenter;
             float distance = drag.magnitude;
+            StickKnob = _stickCenter + Vector2.ClampMagnitude(drag, maximumRadius);
+
             if (distance <= deadZone || maximumRadius <= deadZone)
             {
                 return float2.zero;

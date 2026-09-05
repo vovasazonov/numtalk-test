@@ -3,6 +3,7 @@ using Arch.Unity.Toolkit;
 using Project.GameDomain.Features.Configs.Scripts;
 using Project.GameDomain.Features.PlayerInput.Scripts;
 using VContainer;
+using VContainer.Unity;
 
 namespace Project.GameDomain.Scripts
 {
@@ -16,7 +17,8 @@ namespace Project.GameDomain.Scripts
         public static void Install(IContainerBuilder builder, PlatformerTuningConfig tuning)
         {
             builder.RegisterInstance(tuning);
-            builder.Register<TouchPlayerInputSource>(Lifetime.Singleton).As<IPlayerInputSource>();
+            builder.Register<TouchPlayerInputSource>(Lifetime.Singleton).AsSelf().As<IPlayerInputSource>();
+            builder.RegisterComponentInHierarchy<TouchControlsView>().AsImplementedInterfaces();
 
             InstallInputSampling(builder);
             InstallSimulation(builder);
