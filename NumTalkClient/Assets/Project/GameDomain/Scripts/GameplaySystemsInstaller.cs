@@ -1,6 +1,10 @@
 using Project.GameDomain.Features.Configs.Scripts;
 using Project.GameDomain.Features.PlayerInput.Scripts;
 using VContainer;
+using Arch.Unity;
+using Arch.Unity.Toolkit;
+using Project.GameDomain.Features.Player.Scripts;
+using Project.GameDomain.Features.Physics.Scripts;
 
 namespace Project.GameDomain.Scripts
 {
@@ -14,6 +18,7 @@ namespace Project.GameDomain.Scripts
         public static void Install(IContainerBuilder builder, PlatformerTuningConfig tuning)
         {
             builder.RegisterInstance(tuning);
+            builder.Register<CharacterMotionService>(Lifetime.Singleton);
 
             PlayerInputInstaller.InstallSampling(builder);
             InstallSimulation(builder);
@@ -26,6 +31,7 @@ namespace Project.GameDomain.Scripts
         /// </summary>
         private static void InstallSimulation(IContainerBuilder builder)
         {
+            builder.RegisterSystemIntoArchApp<PlayerMotorSystem>(SystemRunner.FixedUpdate);
             PlayerInputInstaller.InstallLatchReset(builder);
         }
     }

@@ -10,6 +10,7 @@ namespace Project.GameDomain.Features.Presentation.Scripts
     {
         public PrimitiveShape Shape;
         public float3 Size;
+        public float3 LocalOffset;
         public float4 Tint;
     }
 }

@@ -6,5 +6,7 @@ namespace Project.GameDomain.Features.Player.Scripts
     public struct PlayerMotorComponent
     {
         public float3 Velocity;
+        public float3 PreviousPosition;
+        public bool HasSimulationPose;
     }
 }

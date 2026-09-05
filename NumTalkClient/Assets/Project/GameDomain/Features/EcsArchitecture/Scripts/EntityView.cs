@@ -105,6 +105,7 @@ namespace Project.GameDomain.Features.EcsArchitecture.Scripts
 
         private void ReleaseRootComponents(ComponentListener listener)
         {
+            listener.Release();
             IReadOnlyList<Type> required = listener.RequiredRootComponents;
             for (int index = 0; index < required.Count; index++)
             {

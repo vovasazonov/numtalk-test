@@ -20,6 +20,8 @@ namespace Project.GameDomain.Features.EcsArchitecture.Scripts
         public abstract bool Matches(World world, Entity entity);
 
         public abstract void Sync(World world, Entity entity);
+
+        public virtual void Release() { }
     }
 
     public abstract class ComponentListener<TComponent> : ComponentListener where TComponent : struct
@@ -28,7 +30,7 @@ namespace Project.GameDomain.Features.EcsArchitecture.Scripts
 
         public sealed override bool Matches(World world, Entity entity) => world.Has<TComponent>(entity);
 
-        public sealed override void Sync(World world, Entity entity)
+        public override void Sync(World world, Entity entity)
         {
             TComponent component = world.Get<TComponent>(entity);
             UpdateView(in component);

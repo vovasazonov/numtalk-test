@@ -24,6 +24,12 @@ namespace Project.GameDomain.Features.Configs.Scripts
         [Min(0f)] public float CoyoteTime = 0.11f;
         [Min(0f)] public float JumpBufferTime = 0.14f;
 
+        [Header("Character contacts")]
+        [Min(0.001f)] public float GroundProbeDistance = 0.12f;
+        [Min(0f)] public float GroundStickSpeed = 2f;
+        [Min(0f)] public float MaximumInheritedPlatformSpeed = 12f;
+        public LayerMask GroundProbeMask = (1 << 9) | (1 << 10) | (1 << 11);
+
         [Header("Platforms")]
         [Range(0f, 1f)] public float IceDecelerationScale = 0.10f;
         [Min(0f)] public float CrumbleTelegraphTime = 0.35f;

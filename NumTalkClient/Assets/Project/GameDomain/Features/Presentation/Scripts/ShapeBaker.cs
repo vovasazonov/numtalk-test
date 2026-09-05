@@ -27,6 +27,7 @@ namespace Project.GameDomain.Features.Presentation.Scripts
             {
                 Shape = ReadShape(source),
                 Size = source.transform.lossyScale,
+                LocalOffset = Quaternion.Inverse(transform.rotation) * (source.transform.position - transform.position),
                 Tint = new float4(tint.r, tint.g, tint.b, tint.a),
             });
         }

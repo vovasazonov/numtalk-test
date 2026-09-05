@@ -21,6 +21,12 @@ MonoBehaviour:
   FallGravityMultiplier: 1.7
   EarlyReleaseVelocityCut: 0.45
   TerminalFallSpeed: 32
+  GroundProbeDistance: 0.12
+  GroundStickSpeed: 2
+  MaximumInheritedPlatformSpeed: 12
+  GroundProbeMask:
+    serializedVersion: 2
+    m_Bits: 3584
   CoyoteTime: 0.11
   JumpBufferTime: 0.14
   IceDecelerationScale: 0.1
