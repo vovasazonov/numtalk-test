@@ -11,5 +11,12 @@ namespace Project.GameDomain.Features.Physics.Scripts
         public ColliderShape Shape;
         public float3 Size;
         public bool IsTrigger;
+
+        /// <summary>Authored surface friction, baked as values so the component holds no material reference.</summary>
+        public float DynamicFriction;
+        public float StaticFriction;
+        public float Bounciness;
+        public int FrictionCombine;
+        public int BounceCombine;
     }
 }

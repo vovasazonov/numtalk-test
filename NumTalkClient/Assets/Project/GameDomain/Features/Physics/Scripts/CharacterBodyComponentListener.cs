@@ -11,10 +11,12 @@ namespace Project.GameDomain.Features.Physics.Scripts
 {
     public sealed class CharacterBodyComponentListener : ComponentListener<CharacterBodyComponent>
     {
-        private static readonly Type[] RootComponents = { typeof(CharacterController) };
+        private static readonly Type[] RootComponents = { typeof(CharacterController), typeof(CharacterContactRelay) };
         private readonly RaycastHit[] _hits = new RaycastHit[16];
         private CharacterMotionService _motion;
         private CharacterController _controller;
+        private CharacterContactRelay _relay;
+        private readonly List<CharacterContact> _contacts = new();
         private Entity _entity;
         private bool _registered;
         public override IReadOnlyList<Type> RequiredRootComponents => RootComponents;
@@ -37,6 +39,7 @@ namespace Project.GameDomain.Features.Physics.Scripts
         public override void UpdateView(in CharacterBodyComponent component)
         {
             if (_controller != null) return;
+            _relay = transform.parent.GetComponent<CharacterContactRelay>();
             _controller = transform.parent.GetComponent<CharacterController>();
             _controller.height = component.Height;
             _controller.radius = component.Radius;
@@ -73,8 +76,30 @@ namespace Project.GameDomain.Features.Physics.Scripts
             return found;
         }
 
+        /// <summary>Contacts from the last <see cref="Move"/>, as values. Unity objects stop here.</summary>
+        public IReadOnlyList<CharacterContact> DrainContacts()
+        {
+            _contacts.Clear();
+            IReadOnlyList<CharacterContactRelay.Contact> hits = _relay.Contacts;
+            for (int index = 0; index < hits.Count; index++)
+            {
+                CharacterContactRelay.Contact hit = hits[index];
+                var view = hit.Collider.GetComponentInParent<EntityView>();
+                if (view == null) continue;
+                _contacts.Add(new CharacterContact
+                {
+                    Other = view.Entity,
+                    Normal = hit.Normal,
+                    Point = hit.Point,
+                });
+            }
+            _relay.Clear();
+            return _contacts;
+        }
+
         public float3 Move(float3 position, float3 displacement, out bool below, out bool above)
         {
+            _relay.Clear();
             // A restored ECS pose is authoritative even when the view was pooled or teleported.
             if (math.distancesq((float3)_controller.transform.position, position) > 0.000001f)
             {

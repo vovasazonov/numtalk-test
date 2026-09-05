@@ -24,6 +24,16 @@ That figure is agent-assisted time on an already-established contract, not a fro
 
 **Trade-off:** two behaviors can both want to write the platform's pose. I resolved it by precedence rather than by a general arbitration mechanism - a surface that has given way is owned by the crumble system, and `MovingPlatformSystem` yields on any platform that is no longer standable. That is one `if` instead of a scheduler, and it is verified by a test that runs both systems on a single moving-crumble entity.
 
+## 2c. Transform authority on dynamic bodies
+
+Two things wanted to own the pushable crate's root transform: Unity physics through the reference-counted `Rigidbody`, and `EntityTransformComponentListener`, which pushes `EntityTransformComponent` into the root every sync. Left unresolved they fight every frame.
+
+**Physics wins while a dynamic body is simulating, and ECS reads the pose back.** `EntityTransformComponentListener` writes the transform only when the root has no non-kinematic Rigidbody, and `PushableBodySystem` reads position, rotation and velocity back into ECS each fixed tick. ECS stays authoritative for everything kinematic, which is every other entity in the game.
+
+The payoff is that publishing the body's velocity as `PlatformSurfaceComponent.SurfaceVelocity` makes the crate a ride surface for free: it reaches the player through the same rider channel as a moving platform, and jumping off it inherits velocity by the same rule, with no crate-specific code in the motor.
+
+**Trade-off:** a checkpoint restore has to teleport the crate rather than assign its pose, so `RigidBodyService.Teleport` is the single authorised override. Physics being authoritative also means the crate's pose lags ECS by one tick, which is invisible at 60 Hz and is the price of not having two writers.
+
 ## 3. GUI/UI architecture - MVP
 
 I still use **MVP** for UI. Views render the HUD and menus, presenters translate game state into display state, and ECS remains focused on the fixed-step gameplay simulation.

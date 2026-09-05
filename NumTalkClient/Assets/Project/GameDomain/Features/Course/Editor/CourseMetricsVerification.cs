@@ -145,6 +145,7 @@ namespace Project.GameDomain.Features.Course.Editor
                 floor.transform.position = origin + new Vector3(0f, -0.5f, 20f);
                 floor.AddComponent<BoxCollider>().size = new Vector3(4f, 1f, 60f);
                 root.AddComponent<CharacterController>();
+                root.AddComponent<CharacterContactRelay>();
                 var child = new GameObject("Body");
                 child.transform.SetParent(root.transform, false);
                 var listener = child.AddComponent<CharacterBodyComponentListener>();

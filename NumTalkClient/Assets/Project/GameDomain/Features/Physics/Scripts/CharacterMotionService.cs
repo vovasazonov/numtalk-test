@@ -20,5 +20,6 @@ namespace Project.GameDomain.Features.Physics.Scripts
             => _bodies[entity].Probe(distance, mask, out normal, out ground);
         public float3 Move(Entity entity, float3 position, float3 displacement, out bool below, out bool above)
             => _bodies[entity].Move(position, displacement, out below, out above);
+        public IReadOnlyList<CharacterContact> DrainContacts(Entity entity) => _bodies[entity].DrainContacts();
     }
 }

@@ -7,6 +7,7 @@ using Arch.Unity.Toolkit;
 using Project.GameDomain.Features.Player.Scripts;
 using Project.GameDomain.Features.Physics.Scripts;
 using Project.GameDomain.Features.Platforms.Scripts;
+using Project.GameDomain.Features.Pushables.Scripts;
 
 namespace Project.GameDomain.Scripts
 {
@@ -21,6 +22,7 @@ namespace Project.GameDomain.Scripts
         {
             builder.RegisterInstance(tuning);
             builder.Register<CharacterMotionService>(Lifetime.Singleton);
+            builder.Register<RigidBodyService>(Lifetime.Singleton);
 
             PlayerInputInstaller.InstallSampling(builder);
             InstallSimulation(builder);
@@ -39,6 +41,9 @@ namespace Project.GameDomain.Scripts
             builder.RegisterSystemIntoArchApp<CrumblePlatformSystem>(SystemRunner.FixedUpdate);
             builder.RegisterSystemIntoArchApp<PlatformRiderSystem>(SystemRunner.FixedUpdate);
             builder.RegisterSystemIntoArchApp<PlayerMotorSystem>(SystemRunner.FixedUpdate);
+            // After the motor, so the shove uses this tick's contacts and the read-back sees the resulting pose.
+            builder.RegisterSystemIntoArchApp<CratePushSystem>(SystemRunner.FixedUpdate);
+            builder.RegisterSystemIntoArchApp<PushableBodySystem>(SystemRunner.FixedUpdate);
             PlayerInputInstaller.InstallLatchReset(builder);
         }
     }

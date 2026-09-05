@@ -91,6 +91,7 @@ namespace Project.GameDomain.Features.Player.Editor
                 wall.transform.position = new Vector3(10002, 2, 10000);
                 wall.AddComponent<BoxCollider>().size = new Vector3(0.1f, 4, 10);
                 root.AddComponent<CharacterController>();
+                root.AddComponent<CharacterContactRelay>();
                 var child = new GameObject("Body"); child.transform.SetParent(root.transform, false);
                 var listener = child.AddComponent<CharacterBodyComponentListener>();
                 var motion = new CharacterMotionService(); listener.Construct(motion);
