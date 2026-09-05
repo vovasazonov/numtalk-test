@@ -20,7 +20,7 @@ namespace Project.GameDomain.Features.Course.Editor
         public static void FreezeApproach() => Place(new float3(12.5f, 1.6f, 113.7f));
 
         [MenuItem("NumTalk/Preview/Goal (Play Mode)")]
-        public static void Goal() => Place(new float3(20f, 1.6f, 174f));
+        public static void Goal() => Place(new float3(20f, 1.6f, 177f));
 
         [MenuItem("NumTalk/Preview/Shooter (Play Mode)")]
         public static void Shooter() => Place(new float3(-1f, 1.6f, 57f));

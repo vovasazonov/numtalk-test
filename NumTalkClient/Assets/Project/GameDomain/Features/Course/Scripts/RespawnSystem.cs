@@ -48,6 +48,14 @@ namespace Project.GameDomain.Features.Course.Scripts
             }
 
             ref var health = ref World.Get<HealthComponent>(entity);
+            if (run.IsComplete)
+            {
+                health.Phase = PlayerLifePhase.Alive;
+                health.PhaseRemaining = 0f;
+                health.PendingDamage = 0;
+                health.FellOutOfCourse = false;
+                return;
+            }
             if (health.Phase == PlayerLifePhase.Dying)
             {
                 health.PendingDamage = 0;

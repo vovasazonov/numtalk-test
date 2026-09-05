@@ -56,6 +56,7 @@ namespace Project.GameDomain.Features.Course.Scripts
 
         private void Read(Entity entity)
         {
+            if (World.TryGet(entity, out RunStateComponent finished) && finished.IsComplete) return;
             if (!_motion.IsReady(entity) || World.Get<HealthComponent>(entity).Phase == PlayerLifePhase.Dying) return;
 
             IReadOnlyList<Entity> overlapped = _motion.Overlap(entity, _tuning.TriggerContactMask);

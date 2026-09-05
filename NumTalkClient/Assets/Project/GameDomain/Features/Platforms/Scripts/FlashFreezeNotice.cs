@@ -12,6 +12,7 @@ namespace Project.GameDomain.Features.Platforms.Scripts
         private CourseEffects _effects;
         private FlashFreezePhase _phase;
         private int _seconds = -1;
+        private bool _runComplete;
 
         private void OnEnable()
         {
@@ -26,8 +27,16 @@ namespace Project.GameDomain.Features.Platforms.Scripts
             if (Instance == this) Instance = null;
         }
 
+        public void SetRunComplete(bool complete)
+        {
+            _runComplete = complete;
+            if (complete) WeatherLabel.gameObject.SetActive(false);
+            else _seconds = -1;
+        }
+
         public void ShowWeather(in FlashFreezeComponent freeze)
         {
+            if (_runComplete) return;
             int seconds = Mathf.CeilToInt((freeze.Phase == FlashFreezePhase.Warning
                 ? freeze.WarningSeconds : freeze.FrozenSeconds) - freeze.Elapsed);
             if (_phase == freeze.Phase && _seconds == seconds) return;

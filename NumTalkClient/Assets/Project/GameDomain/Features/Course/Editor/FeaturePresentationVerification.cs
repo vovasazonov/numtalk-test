@@ -1,5 +1,6 @@
 using System;
 using Arch.Core;
+using Project.GameDomain.Features.Goal.Scripts;
 using Project.GameDomain.Features.Checkpoints.Scripts;
 using Project.GameDomain.Features.Configs.Scripts;
 using Project.GameDomain.Features.Enemies.Scripts;
@@ -27,6 +28,7 @@ namespace Project.GameDomain.Features.Course.Editor
             VerifyPlatformComposition(catalog);
             VerifyOtherFeatures(catalog);
             VerifyCheckpointGate(catalog);
+            VerifyGoalSalute(catalog);
             return "Feature presentation passed: owning prefab bindings, player animation/landing and interpolation without " +
                 "moving collision, frozen/crumble composition, pooled reset, shooter charge, coin rotation and checkpoint tint.";
         }
@@ -38,6 +40,7 @@ namespace Project.GameDomain.Features.Course.Editor
                 Check(AssetDatabase.GetAssetPath(entry.Prefab) == CourseVisualBuilder.ModelPath(entry.Model), "Wrong art owner: " + entry.Model);
                 Type role = entry.Model switch
                 {
+                    CourseModel.Goal => typeof(GoalModelPresentation),
                     CourseModel.Player => typeof(PlayerModelPresentation),
                     CourseModel.Patrol or CourseModel.Shooter => typeof(EnemyModelPresentation),
                     CourseModel.Coin => typeof(CoinModelPresentation),
@@ -159,6 +162,32 @@ namespace Project.GameDomain.Features.Course.Editor
                 world.Get<CheckpointComponent>(marker).IsActivated = false;
                 view.Present(ref frame);
                 Check(view.Gate.gameObject.activeSelf, "Run restart did not restore checkpoint invitation");
+            }
+            finally { UnityEngine.Object.DestroyImmediate(model); World.Destroy(world); }
+        }
+
+        private static void VerifyGoalSalute(CourseVisualCatalog catalog)
+        {
+            var world = World.Create();
+            var model = UnityEngine.Object.Instantiate(catalog.Find(CourseModel.Goal).Prefab);
+            try
+            {
+                Entity goal = world.Create(new GoalComponent());
+                var view = model.GetComponent<GoalModelPresentation>();
+                view.Bind(world, goal, catalog.Tuning);
+                var frame = Frame(Vector3.zero, false);
+                view.Present(ref frame);
+                Check(!view.IsCelebrating, "Goal celebrates before it is reached");
+                world.Get<GoalComponent>(goal).IsReached = true;
+                view.Present(ref frame);
+                Check(view.IsCelebrating && view.Fireworks.particleCount > 0, "Goal did not launch its salute");
+                frame.DeltaTime = 0.1f;
+                for (int i=0; i<70; i++) view.Present(ref frame);
+                Check(!view.IsCelebrating, "Finish salute loops forever");
+                view.ResetPresentation();
+                Check(view.Fireworks.particleCount == 0, "Pooled finish retained particles");
+                view.Present(ref frame);
+                Check(!view.IsCelebrating, "Rebound completed goal replayed its salute");
             }
             finally { UnityEngine.Object.DestroyImmediate(model); World.Destroy(world); }
         }

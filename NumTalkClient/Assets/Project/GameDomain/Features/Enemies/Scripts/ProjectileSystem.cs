@@ -1,4 +1,5 @@
 using Arch.Core;
+using Project.GameDomain.Features.Course.Scripts;
 using Arch.Unity.Toolkit;
 using Project.GameDomain.Features.Configs.Scripts;
 using Project.GameDomain.Features.EcsArchitecture.Scripts;
@@ -81,6 +82,7 @@ namespace Project.GameDomain.Features.Enemies.Scripts
             Entity target = view.Entity;
             if (!World.IsAlive(target) || !World.Has<ExternalVelocityComponent>(target)) return;
 
+            if (World.TryGet(target, out RunStateComponent run) && run.IsComplete) return;
             if (World.TryGet(target, out HealthComponent health) && health.IsProtected) return;
 
             float3 push = math.normalizesafe(new float3(direction.x, 0f, direction.z));

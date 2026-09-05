@@ -59,3 +59,9 @@ After the core is reliable, I would add camera occlusion handling, remove remain
 - Generated versus written/substantially reworked code: **TBD - record honestly during implementation.**
 - One assistant error and how I caught it: **TBD - record a real example.**
 - One rejected assistant suggestion and why: **TBD - record a real example.**
+
+### Finish celebration and minimal audio
+
+Reaching the goal completes the run in place. Held input is ignored while gravity settles the player onto the final island; damage cannot restart the completed run. A finite four-second salute plays once, and a small completion banner replaces the fullscreen restart overlay. The arena and music remain active. The main menu is unchanged.
+
+Arena audio uses one low-volume CC0 music loop and three short CC0 effects (coin, confirmation, life loss). Checkpoints and finishing share the confirmation cue. Music ducks briefly during death; respawns do not restart it. Sources and licenses are recorded in ASSET_SOURCES.md and beside the assets.

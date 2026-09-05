@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Arch.Core;
+using Project.GameDomain.Features.Course.Scripts;
 using Arch.Unity.Toolkit;
 using Project.GameDomain.Features.Configs.Scripts;
 using Project.GameDomain.Features.EcsArchitecture.Scripts;
@@ -61,6 +62,7 @@ namespace Project.GameDomain.Features.Enemies.Scripts
 
         private void Resolve(Entity entity)
         {
+            if (World.TryGet(entity, out RunStateComponent run) && run.IsComplete) return;
             if (!_motion.IsReady(entity) || World.Get<HealthComponent>(entity).IsProtected) return;
 
             ref var motor = ref World.Get<PlayerMotorComponent>(entity);

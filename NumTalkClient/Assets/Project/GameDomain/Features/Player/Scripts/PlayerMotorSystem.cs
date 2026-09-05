@@ -1,4 +1,5 @@
 using Arch.Core;
+using Project.GameDomain.Features.Course.Scripts;
 using Arch.Unity.Toolkit;
 using Project.GameDomain.Features.Configs.Scripts;
 using Project.GameDomain.Features.Physics.Scripts;
@@ -44,6 +45,15 @@ namespace Project.GameDomain.Features.Player.Scripts
             ref var rider = ref World.Get<PlatformRiderComponent>(entity);
             ref var pose = ref World.Get<EntityTransformComponent>(entity);
             var input = World.Get<PlayerInputComponent>(entity);
+            if (World.TryGet(entity, out RunStateComponent run) && run.IsComplete)
+            {
+                // Settle naturally onto the finish island, without letting held input walk off its edge.
+                input = default;
+                motor.Velocity.x = motor.Velocity.z = 0f;
+                external.Velocity = float3.zero;
+                rider.SurfaceVelocity = float3.zero;
+                jump = default;
+            }
             bool supported = _motion.Probe(entity, _tuning.GroundProbeDistance, _tuning.GroundProbeMask, out var normal, out var support);
             bool grounded = supported && motor.Velocity.y <= 0f && external.Velocity.y <= 0f;
             if (!grounded) rider.SurfaceVelocity = float3.zero;

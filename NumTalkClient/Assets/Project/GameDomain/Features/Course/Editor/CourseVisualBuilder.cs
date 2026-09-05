@@ -1,3 +1,5 @@
+using Project.GameDomain.Features.Goal.Scripts;
+using Project.GameDomain.Features.Audio.Scripts;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -136,7 +138,15 @@ namespace Project.GameDomain.Features.Course.Editor
 
         private static GameObject CreateModel(CourseModel id, string file, Material material)
         {
-            var root = new GameObject(id.ToString());
+            // Preserve authored feature children (checkpoint gate, finish salute) when refreshing the Kenney mesh.
+            var existing = AssetDatabase.LoadAssetAtPath<GameObject>(ModelPath(id));
+            var root = existing != null ? Object.Instantiate(existing) : new GameObject(id.ToString());
+            root.name = id.ToString();
+            foreach (string childName in new[] { "KenneyMesh", "FrostOverlay" })
+            {
+                var child = root.transform.Find(childName);
+                if (child != null) Object.DestroyImmediate(child.gameObject);
+            }
             var mesh = Object.Instantiate(AssetDatabase.LoadAssetAtPath<GameObject>(Source + file + ".fbx"), root.transform);
             mesh.name = "KenneyMesh";
             var renderers = mesh.GetComponentsInChildren<Renderer>();
@@ -262,6 +272,12 @@ namespace Project.GameDomain.Features.Course.Editor
             if (old != null) Object.DestroyImmediate(old.gameObject);
             var root = new GameObject("CourseEffects"); root.transform.SetParent(parent, false);
             var effects = root.AddComponent<CourseEffects>();
+            var audio = root.AddComponent<CourseAudio>();
+            const string audioArt = "Assets/Project/GameDomain/Features/Audio/Art/";
+            audio.Music = AssetDatabase.LoadAssetAtPath<AudioClip>(audioArt + "FlowerbedFields.ogg");
+            audio.Coin = AssetDatabase.LoadAssetAtPath<AudioClip>(audioArt + "Coin.ogg");
+            audio.Confirm = AssetDatabase.LoadAssetAtPath<AudioClip>(audioArt + "Confirm.ogg");
+            audio.LifeLost = AssetDatabase.LoadAssetAtPath<AudioClip>(audioArt + "LifeLost.ogg");
             var particles = new GameObject("PooledSparks").AddComponent<ParticleSystem>();
             particles.transform.SetParent(root.transform, false);
             particles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
@@ -314,6 +330,7 @@ namespace Project.GameDomain.Features.Course.Editor
                 Ensure<FlashFreezeModelPresentation>(root);
             }
             if (model == CourseModel.Checkpoint) Ensure<CheckpointModelPresentation>(root);
+            if (model == CourseModel.Goal) Ensure<GoalModelPresentation>(root);
         }
 
         private static T Ensure<T>(GameObject root) where T : Component

@@ -212,6 +212,10 @@ namespace Project.GameDomain.Features.Course.Editor
             Check(world.IsComplete, "Reaching the flag did not complete the run");
             Check(world.IsCollected(coin), "The route to the goal did not pass the coin");
 
+            float3 finishPosition = world.PlayerPosition;
+            world.Run(new float2(1, 1), 360);
+            Check(world.IsComplete && world.Lives == 3, "Finish reset the run or cost a life");
+            Check(math.distance(world.PlayerPosition.xz, finishPosition.xz) < 0.01f, "Held input moved the player off the finish island");
             world.RequestRestart();
             world.Run(float2.zero, 5);
 

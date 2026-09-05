@@ -72,17 +72,43 @@ namespace Project.GameDomain.ScreensDomain.ArenaDomain.Features.Ui.Editor
             subtitle.color = new Color(0.17f, 0.32f, 0.38f);
             Label(canvas, "MoveHint", "DRAG TO MOVE  /  WASD", new Vector2(0, 0), new Vector2(165, 28), new Vector2(280, 30), 15);
             Label(canvas, "JumpHint", "HOLD TO JUMP  /  SPACE", new Vector2(1, 0), new Vector2(-165, 28), new Vector2(280, 30), 15);
-            var panelRect = panel.GetComponent<RectTransform>();
-            panelRect.anchorMin = Vector2.zero; panelRect.anchorMax = Vector2.one; panelRect.offsetMin = panelRect.offsetMax = Vector2.zero;
-            panel.GetComponent<Image>().color = new Color(0.04f, 0.13f, 0.19f, 0.94f);
-            foreach (var text in panel.GetComponentsInChildren<Text>(true))
-            {
-                text.color = new Color(0.94f, 0.98f, 0.89f); text.fontStyle = FontStyle.Bold;
-                if (text.name == "Title") { text.text = "TRAIL COMPLETE"; text.fontSize = 42; }
-            }
+            ConfigureCompletionPanel(panel);
             panel.SetActive(false);
             PrefabUtility.SaveAsPrefabAsset(root, path);
             PrefabUtility.UnloadPrefabContents(root);
+        }
+
+        [MenuItem("NumTalk/Update Finish Banner")]
+        public static void UpdateFinishBanner()
+        {
+            const string path = "Assets/Project/GameDomain/ScreensDomain/ArenaDomain/Prefabs/ArenaScreen.prefab";
+            var root = PrefabUtility.LoadPrefabContents(path);
+            try
+            {
+                var hud = root.GetComponentInChildren<Project.GameDomain.ScreensDomain.ArenaDomain.Features.Ui.Scripts.ArenaHudView>(true);
+                var data = new SerializedObject(hud);
+                ConfigureCompletionPanel((GameObject)data.FindProperty("_completePanel").objectReferenceValue);
+                PrefabUtility.SaveAsPrefabAsset(root, path);
+            }
+            finally { PrefabUtility.UnloadPrefabContents(root); }
+        }
+
+        private static void ConfigureCompletionPanel(GameObject panel)
+        {
+            Rect(panel.GetComponent<RectTransform>(), new Vector2(0.5f, 1), new Vector2(0, -26), new Vector2(430, 76), new Vector2(0.5f, 1));
+            var background = panel.GetComponent<Image>();
+            background.color = new Color(0.04f, 0.13f, 0.19f, 0.86f);
+            background.raycastTarget = false;
+            foreach (var button in panel.GetComponentsInChildren<Button>(true)) button.gameObject.SetActive(false);
+            foreach (var text in panel.GetComponentsInChildren<Text>(true))
+            {
+                text.raycastTarget = false;
+                if (text.name != "Title") continue;
+                text.text = "TRAIL COMPLETE!";
+                text.color = new Color(1f, 0.85f, 0.35f);
+                text.fontStyle = FontStyle.Bold; text.fontSize = 31;
+                Rect(text.rectTransform, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(410, 64), new Vector2(0.5f, 0.5f));
+            }
         }
 
         private static void Rect(RectTransform rect, Vector2 anchor, Vector2 position, Vector2 size, Vector2 pivot)

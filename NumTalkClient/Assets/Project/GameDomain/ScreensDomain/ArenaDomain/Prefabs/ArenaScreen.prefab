@@ -257,8 +257,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 90}
-  m_SizeDelta: {x: 760, y: 120}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 410, y: 64}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2251351762354799776
 CanvasRenderer:
@@ -281,8 +281,8 @@ MonoBehaviour:
   m_Name:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Text
   m_Material: {fileID: 0}
-  m_Color: {r: 0.94, g: 0.98, b: 0.89, a: 1}
-  m_RaycastTarget: 1
+  m_Color: {r: 1, g: 0.85, b: 0.35, a: 1}
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -290,7 +290,7 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 42
+    m_FontSize: 31
     m_FontStyle: 1
     m_BestFit: 0
     m_MinSize: 10
@@ -301,7 +301,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: TRAIL COMPLETE
+  m_Text: TRAIL COMPLETE!
 --- !u!1 &2061442571306086351
 GameObject:
   m_ObjectHideFlags: 0
@@ -1270,7 +1270,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &434170511822407164
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1432,7 +1432,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Text
   m_Material: {fileID: 0}
   m_Color: {r: 0.94, g: 0.98, b: 0.89, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -1486,11 +1486,11 @@ RectTransform:
   - {fileID: 434170511822407164}
   m_Father: {fileID: 7226295074528490741}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0.5, y: 1}
+  m_AnchorMax: {x: 0.5, y: 1}
+  m_AnchoredPosition: {x: 0, y: -26}
+  m_SizeDelta: {x: 430, y: 76}
+  m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &4455522472642102283
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1512,8 +1512,8 @@ MonoBehaviour:
   m_Name:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0.04, g: 0.13, b: 0.19, a: 0.94}
-  m_RaycastTarget: 1
+  m_Color: {r: 0.04, g: 0.13, b: 0.19, a: 0.86}
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:

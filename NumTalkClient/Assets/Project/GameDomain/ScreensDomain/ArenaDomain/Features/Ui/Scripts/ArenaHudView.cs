@@ -38,7 +38,11 @@ namespace Project.GameDomain.ScreensDomain.ArenaDomain.Features.Ui.Scripts
 
         public void SetCoins(int collected, int total) => _coinLabel.text = $"COINS   {collected:00} / {total}";
 
-        public void SetRunComplete(bool isComplete) => _completePanel.SetActive(isComplete);
+        public void SetRunComplete(bool isComplete)
+        {
+            _completePanel.SetActive(isComplete);
+            Project.GameDomain.Features.Platforms.Scripts.FlashFreezeNotice.Instance?.SetRunComplete(isComplete);
+        }
 
         private void OnRestartClicked() => RestartClicked?.Invoke();
     }
