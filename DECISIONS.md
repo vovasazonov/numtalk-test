@@ -19,3 +19,10 @@ I had previously developed the project foundation—the core, screens, domains, 
 The game was initially not visible on Android. I found the device logs myself and sent the Android errors to AI to help identify the issue. I then resolved it with AI assistance.
 
 Visuals and audio were especially important to me. I rejected performance checks because the game is small and those checks would take too much time. All Priority C items in [PLAN.md](PLAN.md) remain unimplemented: camera occlusion handling, an extra movement ability, zero-allocation profiling, and deterministic replay.
+
+## Known issues left due to time constraints
+
+I left the following known issues unresolved:
+
+- The checkpoint visual effect displays incorrectly.
+- The shooting enemy is positioned slightly too high, so its bullets pass above the player. To test being hit by a bullet, jump into its path.
