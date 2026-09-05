@@ -1,5 +1,6 @@
 using Arch.Unity.Conversion;
 using Project.GameDomain.Features.Course.Scripts;
+using Project.GameDomain.Features.PlayerInput.Scripts;
 using Unity.Mathematics;
 using UnityEngine;
 
@@ -27,6 +28,7 @@ namespace Project.GameDomain.Features.Player.Scripts
                 Position = transform.position,
                 Rotation = transform.rotation,
             });
+            converter.AddComponent(new PlayerInputComponent());
             converter.AddComponent(new PlayerMotorComponent());
             converter.AddComponent(new JumpStateComponent());
             converter.AddComponent(new GroundStateComponent { GroundNormal = math.up() });

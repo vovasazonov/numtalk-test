@@ -197,7 +197,7 @@ Task status uses standard Markdown checkboxes: change `- [ ]` to `- [x]` when th
 - [x] **A1 - Establish the platformer foundation.** Create feature folders, `PlatformerTuningConfig.asset`, physics materials, named layers, and the clean 3D scene hierarchy described above.
 - [x] **A2 - NOT RELEVANT ANYMORE
 - [x] **A3 - Build the full primitive blockout.** Place player spawn, platforms, gaps, hazards, checkpoints, crate route, enemies, coins, and goal in the Unity Scene view. Every interactive object has its semantic baker/authoring component.
-- [ ] **A4 - Establish fixed-step ECS scheduling.** Register simulation systems in `SystemRunner.FixedUpdate`, presentation systems separately, and input edges as latches consumed by the next simulation tick.
+- [x] **A4 - Establish fixed-step ECS scheduling.** Register simulation systems in `SystemRunner.FixedUpdate`, presentation systems separately, and input edges as latches consumed by the next simulation tick.
 - [ ] **A5 - Implement two-thumb mobile input.** Deliver the left floating stick and right jump region with simultaneous pointers; validate it on an Android device before continuing.
 - [ ] **A6 - Implement the player motor.** Add camera-relative acceleration/deceleration, the three velocity channels, ground probe, variable jump, jump cut, coyote time, jump buffer, gravity split, terminal speed, and visual interpolation.
 - [ ] **A7 - Implement readable third-person camera.** Add damping, velocity lead, ground-reference vertical follow, and baseline course framing that leaves the player and next commitment visible.
