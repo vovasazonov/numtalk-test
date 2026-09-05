@@ -1,8 +1,0 @@
-{
-  "base_speed": 0.5,
-  "horizontal_boost": 0.5,
-  "min_speed": 0.1,
-  "vertical_speed": 1.0,
-  "return_rate": 5.0,
-  "jump_force": 3.0
-}

@@ -1,0 +1,82 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 584cbad4e24034673a04d916a2e1d615, type: 3}
+  m_Name: CourseVisualCatalog
+  m_EditorClassIdentifier: Project.GameDomain::Project.GameDomain.Features.Presentation.Scripts.CourseVisualCatalog
+  Tuning: {fileID: 11400000, guid: df8e04450fb4643b398656614119fd8e, type: 2}
+  Entries:
+  - Model: 1
+    Prefab: {fileID: 1704803912828941622, guid: 9a30da5f542c9479e8fa0fdfbd12bd42, type: 3}
+    Idle: {fileID: 0}
+    Walk: {fileID: 0}
+    Jump: {fileID: 0}
+    Fall: {fileID: 0}
+  - Model: 2
+    Prefab: {fileID: 5585820580030315216, guid: 54ef2c5dbae344dfb859685901d6d735, type: 3}
+    Idle: {fileID: 0}
+    Walk: {fileID: 0}
+    Jump: {fileID: 0}
+    Fall: {fileID: 0}
+  - Model: 3
+    Prefab: {fileID: 3689573100796361434, guid: 64b578efa982b49ef941bcda11b2902e, type: 3}
+    Idle: {fileID: 0}
+    Walk: {fileID: 0}
+    Jump: {fileID: 0}
+    Fall: {fileID: 0}
+  - Model: 4
+    Prefab: {fileID: 6670737029586676358, guid: b358f1f8109c14f5e91e1029e184c839, type: 3}
+    Idle: {fileID: 0}
+    Walk: {fileID: 0}
+    Jump: {fileID: 0}
+    Fall: {fileID: 0}
+  - Model: 5
+    Prefab: {fileID: 8952102835574588322, guid: 88c9cfb409cd04770ade537bc1c231ad, type: 3}
+    Idle: {fileID: 0}
+    Walk: {fileID: 0}
+    Jump: {fileID: 0}
+    Fall: {fileID: 0}
+  - Model: 6
+    Prefab: {fileID: 8393797904200655186, guid: c4d1666f2f2624b5c9d95ed3811dfdb2, type: 3}
+    Idle: {fileID: -5252816984213320552, guid: edd0e2f5699cd4b00b7e61b3bc2a7cdd, type: 3}
+    Walk: {fileID: -3419257869308726280, guid: edd0e2f5699cd4b00b7e61b3bc2a7cdd, type: 3}
+    Jump: {fileID: -2993534804863918692, guid: edd0e2f5699cd4b00b7e61b3bc2a7cdd, type: 3}
+    Fall: {fileID: -1504929105726005784, guid: edd0e2f5699cd4b00b7e61b3bc2a7cdd, type: 3}
+  - Model: 7
+    Prefab: {fileID: 2528821422449654224, guid: 504235bdcdf2f46209b5fad988fc4554, type: 3}
+    Idle: {fileID: -5252816984213320552, guid: d3eacbd317aa74350ad026d0588bc53d, type: 3}
+    Walk: {fileID: -3419257869308726280, guid: d3eacbd317aa74350ad026d0588bc53d, type: 3}
+    Jump: {fileID: -2993534804863918692, guid: d3eacbd317aa74350ad026d0588bc53d, type: 3}
+    Fall: {fileID: -1504929105726005784, guid: d3eacbd317aa74350ad026d0588bc53d, type: 3}
+  - Model: 8
+    Prefab: {fileID: 6769224785212328189, guid: 4e0bde28465e44e10b0b22588edc3271, type: 3}
+    Idle: {fileID: -5252816984213320552, guid: ff1a3e12569314a08ae6101b1a67893e, type: 3}
+    Walk: {fileID: -3419257869308726280, guid: ff1a3e12569314a08ae6101b1a67893e, type: 3}
+    Jump: {fileID: -2993534804863918692, guid: ff1a3e12569314a08ae6101b1a67893e, type: 3}
+    Fall: {fileID: -1504929105726005784, guid: ff1a3e12569314a08ae6101b1a67893e, type: 3}
+  - Model: 9
+    Prefab: {fileID: 3178574686918519672, guid: 142d1f4f231a04effb04bdeffa94fad7, type: 3}
+    Idle: {fileID: 0}
+    Walk: {fileID: 0}
+    Jump: {fileID: 0}
+    Fall: {fileID: 0}
+  - Model: 10
+    Prefab: {fileID: 7112390464498832516, guid: 783118399747545c6b33d1d023674ba6, type: 3}
+    Idle: {fileID: 0}
+    Walk: {fileID: 0}
+    Jump: {fileID: 0}
+    Fall: {fileID: 0}
+  - Model: 11
+    Prefab: {fileID: 5308251336049497188, guid: bf9c36667cbcb4502937299ea25bbd52, type: 3}
+    Idle: {fileID: 0}
+    Walk: {fileID: 0}
+    Jump: {fileID: 0}
+    Fall: {fileID: 0}

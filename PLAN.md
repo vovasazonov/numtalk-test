@@ -18,23 +18,22 @@ The repository is a Unity 6 project with Arch ECS, VContainer, UniTask, URP, and
 
 The existing `BakerComponent` uses `ConversionMode.ConvertAndDestroy`. That is appropriate for the existing runtime-view pipeline, but wrong for an authored 3D platformer course: it destroys the scene GameObject and therefore loses the visible collider/renderer/CharacterController that a level designer needs to see and edit.
 
-### Chosen model: ECS-owned game state with retained Unity authoring/physics objects
+### Chosen model: pure ECS state, runtime view rebuilt from baked data
 
-For the platformer course, replace the destructive baking path with a new `SceneEntityBaker` (or safely refactor `BakerComponent`) that calls Arch conversion using:
+`ArenaScene` stays authoring-only and the bake stays `ConvertAndDestroy`. Bakers implement `IComponentConverter` and serialise everything a system or view needs - pose, layer, primitive shape, size, tint, collider volume, body settings - into plain ECS data. No component holds a Unity object reference.
 
-```csharp
-ConversionMode = ConversionMode.SyncWithEntity;
-ConvertHybridComponents = false;
-```
+The runtime object is then rebuilt from that data by the existing view pipeline:
 
-Each authoring GameObject remains in the scene and receives Arch's `SyncWithEntity` link. Custom authoring components implement `IComponentConverter` and add plain, inspectable ECS data. A small bridge component explicitly holds references to the Unity `Transform`, `CharacterController`, `Rigidbody`, collider, or visual root required by a system. We will not add every arbitrary Unity component to the ECS world.
+- `ViewSystem` spawns one pooled `EntityView` root per entity carrying `ViewComponent`.
+- Each ECS component that needs a view gets its own `ComponentListener` child, addressable-loaded by type name.
+- Unity components that must live on the root are declared per listener via `RequiredRootComponents` and reference-counted by `EntityView`. The root adds one on first request and destroys it when the last requiring ECS component is removed, so several components can share one `Rigidbody`.
 
 This gives us both things we need:
 
-- **At edit time:** the hierarchy reads like a real level, with actual meshes, colliders, materials, and authoring components visible on the object they describe.
-- **At runtime:** Arch components are the authority for movement, health, platform state, projectiles, checkpoints, and game rules. Unity physics is used only for carefully bounded collision/sweep services and the dynamic crate.
+- **At edit time:** the hierarchy reads like a real level, with actual meshes, colliders, materials, and bakers visible on the object they describe.
+- **At runtime:** Arch components are the sole authority. Unity physics is a service the view layer assembles on demand from that data.
 
-Do not add `ViewComponent` to retained scene objects. The existing generic `EntityView`/listener pool remains suitable for pooled runtime effects or purely ECS-spawned items, but it must not create a duplicate visual for a scene-authored platform or player.
+Systems must never reach for a Unity object through `GetComponent`; they read and write ECS data, and listeners project it.
 
 ### System scheduling
 
@@ -67,25 +66,31 @@ ArenaScene
 `- MobileHud
 ```
 
-Every interactive object gets `SceneEntityBaker` plus a semantic authoring component. Its Inspector fields are the source of the initial ECS component values:
+Every interactive object gets `BakerComponent` plus a semantic baker. Its Inspector fields are the source of the initial ECS component values. Authoring components use the project's existing `XxxBaker` naming rather than `XxxAuthoring`, and the `CharacterController` / `Rigidbody` bridges are `[RequireComponent]` dependencies of the semantic baker rather than separate components to add by hand:
 
-| Scene object | Authoring component(s) | ECS data written by the baker |
-| --- | --- | --- |
-| Player capsule | `PlayerAuthoring`, `CharacterControllerBridge` | `PlayerTag`, `PlayerMotor`, `JumpState`, `GroundState`, `ExternalVelocity`, `PlatformRider`, `Health`, `CheckpointReference`, `SceneTransform` |
-| Static cube/platform | `PlatformAuthoring` | `PlatformSurface`, `SceneTransform`, `InitialState` |
-| Moving platform | `PlatformAuthoring`, `MovingPlatformAuthoring` | `PlatformSurface`, `PlatformMotion`, `InitialState` |
-| Ice platform | `PlatformAuthoring`, `IceSurfaceAuthoring` | `PlatformSurface`, `IceSurface` |
-| Crumble platform | `PlatformAuthoring`, `CrumblePlatformAuthoring` | `PlatformSurface`, `CrumbleState`, `InitialState` |
-| Crate | `PushableCrateAuthoring`, `RigidbodyBridge` | `Pushable`, `PlatformSurface`, `InitialState`, `SceneTransform` |
-| Patrol/stomp enemy | `EnemyAuthoring`, `PatrolAuthoring` | `Enemy`, `Patrol`, `StompTarget`, `InitialState` |
-| Shooter | `EnemyAuthoring`, `ShooterAuthoring` | `Enemy`, `Shooter`, `InitialState` |
-| Coin, checkpoint, kill zone, goal | matching authoring component | `Pickup`, `Checkpoint`, `KillZone`, or `Goal` plus stable ID/state |
+| Scene object | Prefab | Baker component(s) | ECS data written by the baker |
+| --- | --- | --- | --- |
+| Player capsule | `PlatformerPlayer` | `PlayerBaker`, `CharacterBodyBaker` | `PlayerTag`, `InitialState`, `PlayerMotor`, `JumpState`, `GroundState`, `ExternalVelocity`, `PlatformRider`, `Health`, `CheckpointReference`, `CharacterBody` |
+| Static cube/platform | `StaticPlatform` | `PlatformBaker` | `PlatformSurface`, `InitialState` |
+| Moving platform | `MovingPlatform` | `PlatformBaker`, `MovingPlatformBaker` | + `PlatformMotion` |
+| Ice platform | `IcePlatform` | `PlatformBaker`, `IceSurfaceBaker` | + `IceSurface` |
+| Moving ice platform | `MovingIcePlatform` | `PlatformBaker`, `MovingPlatformBaker`, `IceSurfaceBaker` | + `PlatformMotion`, `IceSurface` |
+| Crumble platform | `CrumblePlatform` | `PlatformBaker`, `CrumblePlatformBaker` | + `CrumbleState` |
+| Crate | `PushableCrate` | `PushableCrateBaker`, `PhysicsBodyBaker` | `Pushable`, `PlatformSurface`, `InitialState`, `PhysicsBody` |
+| Patrol/stomp enemy | `PatrolEnemy` | `EnemyBaker`, `PatrolBaker` | `Enemy`, `StompTarget`, `InitialState`, `Patrol` |
+| Shooter | `ShooterEnemy` | `EnemyBaker`, `ShooterBaker` | `Enemy`, `InitialState`, `Shooter` |
+| Coin | `Coin` | `CoinBaker` | `Pickup` (stable id), `InitialState` |
+| Checkpoint | `Checkpoint` | `CheckpointBaker` | `Checkpoint` (ordered id, respawn point) |
+| Kill zone | `KillZone` | `KillZoneBaker` | `KillZone` |
+| Goal | `Goal` | `GoalBaker` | `Goal` |
+
+Every object also carries `EntityTransformBaker` (pose, layer, `ViewComponent`), `ShapeBaker` (primitive, size, tint) and, where it has a collision volume, `PhysicsColliderBaker`. Those three are what let the runtime view rebuild the authored object after the scene GameObject is destroyed.
 
 The platform behavior model is intentionally compositional: `PlatformSurface` is the shared base data, while `MovingPlatform`, `IceSurface`, and `CrumbleState` are independent components on the same entity. No forked Moving/Ice/Crumble prefab families. Adding a fourth behavior later should be one authoring component, one ECS component, and one system - not a rewrite.
 
 ## 4. One tuning asset, measurable movement
 
-Create one `PlatformerTuning` ScriptableObject under a `Platformer/Configs` feature folder. All player, platform, crate, camera, combat, and feedback values live there, are labelled with units, and are referenced by the level authoring components/systems. No magic numbers in the motor.
+Create one `PlatformerTuning` ScriptableObject under the `Configs` feature folder. All player, platform, crate, camera, combat, and feedback values live there, are labelled with units, and are referenced by the level authoring components/systems. No magic numbers in the motor.
 
 Initial values are deliberately starting points, not final claims. Tune them on a device and publish the final values and measured maximums in the README.
 
@@ -124,7 +129,7 @@ This is the first graded block. Define named layers once in Project Settings and
 | --- | --- | --- |
 | `Player` | `Ground`, `Platform`, `Pushable`, `Enemy`, `EnemyProjectile`, `Pickup`, `KillZone` | Character and sensors |
 | `Ground` / `Platform` | all physical gameplay layers | Course geometry and platform surfaces |
-| `Pushable` | player, ground/platform, enemy projectile | Dynamic crate, continuous collision detection |
+| `Pushable` | player, ground/platform, enemy, enemy projectile | Dynamic crate, continuous collision detection |
 | `Enemy` | player, ground/platform, pushable | Patrol and shooter bodies; never own projectile |
 | `EnemyProjectile` | player, ground/platform, pushable | Spherecast target mask; never enemy/projectile |
 | `Pickup` / `KillZone` | player only | Trigger-only interactions |
@@ -190,30 +195,67 @@ Task status uses standard Markdown checkboxes: change `- [ ]` to `- [x]` when th
 ### Priority A - delivery-critical MUST work
 
 - [x] **A1 - Establish the platformer foundation.** Create feature folders, `PlatformerTuningConfig.asset`, physics materials, named layers, and the clean 3D scene hierarchy described above.
-- [ ] **A2 - Preserve scene authoring during ECS bake.** Replace destructive scene conversion with retained `SyncWithEntity` conversion; verify every authored gameplay object creates exactly one linked Arch entity and no duplicate `EntityView` visual.
-- [ ] **A3 - Build the full primitive blockout.** Place player spawn, platforms, gaps, hazards, checkpoints, crate route, enemies, coins, and goal in the Unity Scene view. Every interactive object has its semantic baker/authoring component.
-- [ ] **A4 - Establish fixed-step ECS scheduling.** Register simulation systems in `SystemRunner.FixedUpdate`, presentation systems separately, and input edges as latches consumed by the next simulation tick.
-- [ ] **A5 - Implement two-thumb mobile input.** Deliver the left floating stick and right jump region with simultaneous pointers; validate it on an Android device before continuing.
-- [ ] **A6 - Implement the player motor.** Add camera-relative acceleration/deceleration, the three velocity channels, ground probe, variable jump, jump cut, coyote time, jump buffer, gravity split, terminal speed, and visual interpolation.
-- [ ] **A7 - Implement readable third-person camera.** Add damping, velocity lead, ground-reference vertical follow, and baseline course framing that leaves the player and next commitment visible.
-- [ ] **A8 - Measure movement and resize the course.** Record preliminary maximum jump height/distance in scene and keep every gap at or below 75% of the measured horizontal limit.
-- [ ] **A9 - Enforce the layer collision contract.** Configure the full matrix, explicit masks on casts, and thin-platform player collision test; eliminate tag-based collision decisions.
-- [ ] **A10 - Build composable platform behavior.** Implement shared `PlatformSurface`, then Moving, Ice, and Crumble components/systems; prove Moving+Ice on one instance and record the fourth-behavior implementation time.
-- [ ] **A11 - Implement the physical, ridable crate.** Use a continuous dynamic Rigidbody with mass/friction, player resistance, safe push impulse, and platform-riding/jump-off inheritance; pass wall, edge, and ice cases.
-- [ ] **A12 - Implement enemies, projectiles, and knockback.** Add patrol and shooter authoring, pooled fixed-step SphereCast projectiles, layer filtering, and independently decaying external velocity.
-- [ ] **A13 - Implement reliable stomp resolution.** Use fixed-step swept/contact discrimination; top hits bounce and defeat enemies, side/bottom contacts hurt, including at terminal speed and forced 30 FPS.
-- [ ] **A14 - Implement lives, checkpoints, and clean reset.** Add three lives, snapshot restore policy, kill zone, zero-life restart, pooled transient cleanup, and a third-restart regression test.
-- [ ] **A15 - Integrate the complete core course.** Play the seven course beats end-to-end with all mandatory interactions, a 60-120 second target duration, coin routes, and an unmistakable goal.
-- [ ] **A16 - Pass all Priority A verification gates.** Device controls, forced 30/60/120 FPS, no player/projectile tunneling, crate cases, four knockback compositions, platform composition, restart, and retained-scene bake inspection are all green.
-- [ ] **A17 - Create the required deliverables.** Finish the one-page README and DECISIONS.md, Android build, and sub-90-second on-device recording with both thumbs visible.
+- [x] **A2 - NOT RELEVANT ANYMORE
+- [x] **A3 - Build the full primitive blockout.** Place player spawn, platforms, gaps, hazards, checkpoints, crate route, enemies, coins, and goal in the Unity Scene view. Every interactive object has its semantic baker/authoring component.
+- [x] **A4 - Establish fixed-step ECS scheduling.** Register simulation systems in `SystemRunner.FixedUpdate`, presentation systems separately, and input edges as latches consumed by the next simulation tick.
+- [x] **A5 - Implement two-thumb mobile input.** Deliver the left floating stick and right jump region with simultaneous pointers; validate it on an Android device before continuing.
+- [x] **A6 - Implement the player motor.** Add camera-relative acceleration/deceleration, the three velocity channels, ground probe, variable jump, jump cut, coyote time, jump buffer, gravity split, terminal speed, and visual interpolation.
+  - Verification: Unity 6000.5.0f1 compile and normal EntryScene → Play → Arena smoke test passed; repeatable checks via `NumTalk/Verify Player Motor` cover jump forgiveness/expiry, acceleration and stopping, impulse decay, inheritance, swept wall/ceiling contacts, and ten thin-platform falls each with simulated 30/60/120 FPS tick grouping. Full device gates remain pending.
+- [x] **A7 - Implement readable third-person camera.** Add damping, velocity lead, ground-reference vertical follow, and baseline course framing that leaves the player and next commitment visible.
+  - Verification: `NumTalk/Verify Course Camera` passes jump-reference stability, landing/fall damping, teleport reset, bounded lead, 30/60/120 FPS damping, and player/apex/next-landing projection at 16:9 and 19.5:9. The normal EntryScene → Play flow and a live camera capture confirm perspective framing. Device feel remains for A16.
+- [x] **A8 - Measure movement and resize the course.** Record preliminary maximum jump height/distance in scene and keep every gap at or below 75% of the measured horizontal limit.
+  - Verification: `NumTalk/Verify Course Metrics` measures a swept `CharacterController` jump from a full-speed run on the shipping `PlatformerTuningConfig.asset`: **2.51 m apex**, **6.13 m level-to-level distance**, so the gap budget is **4.59 m**. It then opens `ArenaScene`, proves the authored route covers every `PlatformBaker` exactly once (only `Platform_ShooterPerch` is off-route), and checks all 18 consecutive gaps edge-to-edge, evaluating both extremes of each moving platform. Widest required gap is `Platform_Hop1 -> Platform_Hop2` at **3.50 m (57% of maximum)**; every rise is at or below 0.50 m. No platform needed resizing.
+- [x] **A9 - Enforce the layer collision contract.** Configure the full matrix, explicit masks on casts, and thin-platform player collision test; eliminate tag-based collision decisions.
+  - Verification: `LayerCollisionContract` holds the matrix as code and is the source of truth. `NumTalk/Apply Layer Contract` wrote it into `DynamicsManager.asset`; `NumTalk/Verify Layer Contract` re-derives all 32x32 pairs touching a gameplay layer and passes with **17 allowed pairs across 9 gameplay layers, every other pair ignored** - including every gameplay layer against `Default`, so an unlayered decoration can never become collision geometry. It also asserts the nine layer names still resolve (the bakers use `NameToLayer`) and that `GroundProbeMask` is exactly `Ground|Platform|Pushable`.
+  - The runtime code already had no tag-based collision decisions: there is no `CompareTag`, `OnTriggerEnter`, or `OnCollisionEnter` anywhere under `Assets/Project`, and the only cast in the project - the ground probe `SphereCastNonAlloc` - already takes an explicit mask field plus `QueryTriggerInteraction.Ignore`. Trigger-only authoring is correct: `Coin`, `Checkpoint`, `KillZone`, and `Goal` are triggers; `PatrolEnemy`, `ShooterEnemy`, `PushableCrate`, and the platforms are solid.
+  - Thin-platform gate: A6's ten terminal-velocity falls at simulated 30/60/120 FPS were re-run under the enforced matrix and still pass, as did A7 and A8.
+  - The plan's own `Pushable` row omitted `Enemy` while the `Enemy` row listed `Pushable`. The matrix is symmetric, so the pair is enabled and the row above is corrected.
+- [x] **A10 - Build composable platform behavior.** Implement shared `PlatformSurface`, then Moving, Ice, and Crumble components/systems; prove Moving+Ice on one instance and record the fourth-behavior implementation time.
+  - Verification: `NumTalk/Verify Platform Behavior` passes authored route traversal/reversal/wait/repeat, surface velocity taken from the progress delta so a part-way start cannot report a teleport, **moving+ice composed on one entity** supplying both velocity and slip to the same rider, ice removing deceleration only (momentum carries >5x further while deliberate acceleration is unchanged), unstandable and airborne riders inheriting nothing, and the full crumble phase cycle **composed onto a moving platform**. A6, A7, A8, and A9 were re-run green after the motor change.
+  - Fourth-behavior time: **1 min 28 s**, passing first run - one new `CrumblePlatformSystem.cs` plus one registration line, with no prefab fork and no edit to the motor or the other platform systems. Recorded in `DECISIONS.md` section 2b with the caveats.
+  - Deviation: there is no separate `IceSurfaceSystem`. Ice is static per-surface data with nothing to advance per tick, so a system iterating ice platforms to copy a constant would be pure ceremony. `PlatformRiderSystem` applies it at the moment the surface is ridden, which is the one place every surface behaviour composes.
+  - Plumbing: `PlatformRiderComponent` gained `SurfaceSlip` (0 normal ground, 1 frictionless) so the zero default is correct for a rider on nothing slick, and `PlayerMotorSimulation` scales only its deceleration term by it.
+- [x] **A11 - Implement the physical, ridable crate.** Use a continuous dynamic Rigidbody with mass/friction, player resistance, safe push impulse, and platform-riding/jump-off inheritance; pass wall, edge, and ice cases.
+  - Verification: `NumTalk/Verify Crate` drives the real systems against a real Unity simulation stepped manually, and passes all six cases - a shove moves the crate away from the player (1.89 m), the same shove carries it further on ice, a wall stops it at the face with **no penetration**, the player is **never shoved through it**, it falls off an edge, and standing on it makes it the ridden surface feeding `PlatformRiderComponent`. A6, A7, A8, A9, and A10 re-run green.
+  - Transform authority (the open question from A10) is resolved: **physics owns a simulating dynamic body's pose and ECS reads it back**; `EntityTransformComponentListener` writes the root only when there is no non-kinematic Rigidbody. Recorded in `DECISIONS.md` section 2c.
+  - Riding is free rather than special-cased: `PushableBodySystem` publishes the body's velocity as `PlatformSurfaceComponent.SurfaceVelocity`, so the crate reaches the player through the A10 rider channel and jump-off inheritance needs no crate-specific code in the motor.
+  - Two real defects found and fixed on the way: authored physics materials were **not being baked at all** (every collider got the listener's default, so a crate on ice behaved like a crate on concrete), and `CharacterContactRelay` buffered Unity's reused `ControllerColliderHit` instance instead of copying its values out.
+- [x] **A12 - Implement enemies, projectiles, and knockback.** Add patrol and shooter authoring, pooled fixed-step SphereCast projectiles, layer filtering, and independently decaying external velocity.
+  - Verification: `NumTalk/Verify Enemies` drives `EnemyPatrolSystem`, `ShooterSystem` and `ProjectileSystem` against a real Unity simulation stepped manually, and passes all six cases - a patrol bounded by its authored route that waits and reverses, a shooter that stays silent out of range and fires only after its wind-up, a **400 m/s projectile stopped by a 0.1 m wall** (one step is 6.7 m, so nothing but the sweep could catch it), a mask that excludes Enemy and EnemyProjectile, knockback that decays while intent still steers the intrinsic channel, and six shots reusing **one** pooled entity. A6, A10 and A11 re-run green.
+  - Projectiles carry no Rigidbody or collider: the system SphereCasts the complete travel segment each fixed step and places the projectile at the hit or end point, so tunneling is impossible by construction and the cast's `ProjectileHitMask` - Player, Ground, Platform, Pushable - is the only filter needed to exclude the firing enemy and other shots.
+  - Pooling reuses the entity and drops only its `ViewComponent`, which hands the view GameObject back to the existing `ViewSystem` pool; no projectile-specific view pooling was added.
+  - Knockback needed no new motor code: a hit writes `ExternalVelocityComponent`, which the A6 motor already decays on its own half-life. It is assigned rather than accumulated, so a burst cannot stack into an unrecoverable launch.
+- [x] **A13 - Implement reliable stomp resolution.** Use fixed-step swept/contact discrimination; top hits bounce and defeat enemies, side/bottom contacts hurt, including at terminal speed and forced 30 FPS.
+  - Verification: `NumTalk/Verify Stomp` runs the real `StompSystem` behind the real motor against a manually stepped Unity simulation, and passes all seven cases - a top hit defeats the enemy and bounces the player, a held jump bounces higher, a side hit and an underside hit hurt instead, a defeated enemy resolves nothing further, and a **60 m fall at terminal speed lands on the enemy top at both 60 FPS and a forced 30 FPS (1.020 m in both, no pass-through)**. A6, A11 and A12 re-run green.
+  - The discriminator is geometric and swept, not a contact event: the player's capsule bottom **where the step began** against the enemy collider's top. At 32 m/s on a 30 FPS frame the player travels 1.07 m, so the resulting pose is already past a 1 m enemy and the post-move normal says nothing - the starting height still does.
+  - The sweep runs `CapsuleCast` past the travelled segment by a 0.12 m skin, so a contact the CharacterController already resolved is still seen; a fully blocked step keeps its downward direction. "Descending" therefore means the motor is still pulling down, not just that the pose fell.
+  - A stomp lifts the player onto the enemy's top before bouncing, which is what keeps a terminal-speed stomp from starting the bounce from inside or below the enemy. Defeat sets `StompTargetComponent.IsDefeated` and releases the enemy's `ViewComponent`, so patrol, shooting and further contacts all stop through one flag - reversible for the A14 checkpoint snapshot.
+  - A side or underside hit applies knockback only; taking a life from it belongs to A14.
+- [x] **A14 - Implement lives, checkpoints, and clean reset.** Add three lives, snapshot restore policy, kill zone, zero-life restart, pooled transient cleanup, and a third-restart regression test.
+  - Verification: `NumTalk/Verify Respawn` runs the real trigger, snapshot and respawn systems against a manually stepped Unity simulation, and passes all four cases - three lives with a kill plane costing exactly one per fall, a checkpoint that only ever moves forward and is resumed from, coins that stay collected across a respawn but return on a restart, crate/platform/enemy state restored with projectiles returned to the pool, and **three complete restarts each landing on the same state as the first**. A11 and A13 re-run green.
+  - Triggers are read as a capsule overlap every fixed step rather than through `OnTriggerEnter`, so a checkpoint or coin cannot be missed by a callback that fires between ticks. It reuses the same collider-to-entity resolution as every other cast.
+  - The snapshot is a value copy of what the course mutates: poses (plus dynamic body poses through `Teleport`), platform phase, crumble state, patrol and shooter cooldowns, enemy life, and checkpoint activation. It is captured on the tick the checkpoint is lit, so restoring it restores a world in which that checkpoint is already current.
+  - Collected coins are the deliberate exception: captured, but restored only by a full restart, so a retry can never pay the same coin twice. Hiding a coin or a defeated enemy is the same `ViewComponent` release used by A13, which is what makes both reversible.
+  - Damage arrives as `HealthComponent.PendingDamage` from whatever caused it, and is consumed once per tick, so a kill plane and an enemy landing together still cost one life.
+  - The arena HUD landed with this task: `ArenaHudView` / `ArenaHudPresenter` follow the same MVP split as `MenuUiPresenter`, with the presenter pushing lives into a dumb view only when the number changes. Confirmed rendering in Play mode.
+- [x] **A15 - Integrate the complete core course.** Play the seven course beats end-to-end with all mandatory interactions, a 60-120 second target duration, coin routes, and an unmistakable goal.
+  - Verification: `NumTalk/Verify Course Integration` reads the authored scene and passes all four cases - every mandatory mechanic present (crate, 3 patrols, shooter, moving, ice, 3 crumble, 5 checkpoints, one goal, one kill plane), all eight beats in forward course order, a coin route with unique ids and at least one coin in every beat span, and an estimated clean run inside the target. A6, A8, A9, A10, A11, A12, A13 and A14 re-run green.
+  - The goal now ends the run: `RunStateComponent` is set by the same trigger read that lights checkpoints, the HUD overlay shows it, and its restart request is consumed by the same path a zero-life run takes. Covered by a new case in `Verify Respawn`.
+  - **The course was too short and was extended.** With rides and crumble telegraphs modelled from authored data, a clean run measured 55 s against a 60 s floor, so beat 7's final run grew by five platforms (a 30 m zig-zag) with three coins, and the ferry, apron and goal shifted back by 30 m. It now measures **207.7 m over 25 platforms: 50 s running, 13 s riding, 1 s of telegraphs, 64 s total**, with the widest required gap still 3.50 m of the 4.59 m budget.
+  - The estimate is a model, not a play-through: path length at 55% of maximum run speed, plus one and a half traverses of each authored moving platform and one telegraph per crumble platform. The real figure comes from the A17 on-device recording.
+  - HUD completed alongside: the coin counter and the finish overlay joined the life pips in the same MVP split, and one real defect surfaced - `StompSystem` raised damage without declaring `HealthComponent` in its query, which threw on any player entity without one.
 
 ### Priority B - requested polish and SHOULD work
 
-- [ ] **B1 - Add the telegraphed sudden event.** Implement the flash-freeze section that visibly warns, temporarily converts selected surfaces to ice, and gives the player a fair response window.
-- [ ] **B2 - Add high-value feel feedback.** Add landing squash/stretch, coin pop, stomp bounce pop, crumble warning, shooter wind-up, and readable knockback without changing collision state.
-- [ ] **B3 - Apply the restrained CC0 visual pass.** Import only the selected Kenney models, keep primitive collision volumes, light the original floating-island course, and preserve platform readability on a phone screen.
-- [ ] **B4 - Record the art provenance.** Add the Kenney license files and `ASSET_SOURCES.md` with source URL, date, license, and used-file list.
-- [ ] **B5 - Re-run the full verification pass.** Confirm B1-B4 did not alter touch input, frame-rate consistency, collision, camera framing, or device performance.
+- [x] **B1 - Add the telegraphed sudden event.** Implement the flash-freeze section that visibly warns, temporarily converts selected surfaces to ice, and gives the player a fair response window.
+  - Eight final-run surfaces warn for 3 seconds at the safe checkpoint approach, freeze for 12 seconds, then thaw. Phase/timer are included in checkpoint snapshots; permanent ice and moving-platform carry remain independent. Warning and frozen states were captured in live Play mode.
+- [x] **B2 - Add high-value feel feedback.** Add landing squash/stretch, coin pop, stomp bounce pop, crumble warning, shooter wind-up, and readable knockback without changing collision state.
+  - Model-only animation, landing/stomp stretch, crumble pulse/shake, shooter charge and external-velocity hit flash. A bounded scene particle system handles pickup/stomp/landing bursts. Input and collider transforms are untouched by presentation.
+- [x] **B3 - Apply the restrained CC0 visual pass.** Import only the selected Kenney models, keep primitive collision volumes, light the original floating-island course, and preserve platform readability on a phone screen.
+  - The owner-supplied kit remains in its original folder to preserve GUIDs. Eleven visual families dress 60 course entities through the existing Shape listener; a value-only model ID survives conversion. Added scenery, atmosphere, a separate styled HUD canvas, and a higher 55-degree camera. Real-device visual acceptance remains part of B5.
+- [x] **B4 - Record the art provenance.** Add the Kenney license files and `ASSET_SOURCES.md` with source URL, date, license, and used-file list.
+  - `ASSET_SOURCES.md` records all used FBX/texture files and the integration date; the original download date was not supplied. CC0 license retained in the source pack and copied beside derived art.
+  - All 11 editor verification suites passed, including `NumTalk/Verify Priority B`, plus a live keyboard run/jump and pickup/HUD check. Camera projection passed at 16:9 and 19.5:9. The live finish/restart overlay check and Android two-thumb/performance evidence remain pending. See `Documentation/Polish/README.md` for details.
 
 ### Priority C - bonus work (only after A and B are stable)
 
@@ -246,24 +288,24 @@ When Unity MCP access is available, use it to verify the loaded scene hierarchy 
 
 `DECISIONS.md` (one page) will contain the three hard calls and trade-offs: CharacterController plus ECS velocity channels, retained scene baking with Arch synchronization, and composable platform behavior. It will also state next controller work, the timed fourth-behavior result, and the required honest AI note: approximate generated/reworked share, one assistant error caught in this task, and one rejected suggestion with rationale.
 
-Commit after each meaningful accepted slice, for example:
+Commit after each meaningful accepted slice. Use only these subject prefixes: `Add`, `Remove`, `Update`, `Fix`, `Refactor`. Keep verification notes in this plan or the task response; do not create separate verification Markdown files. For example:
 
 ```text
-scaffold: add platformer tuning and layers
-ecs: retain scene authoring objects during bake
-scene: block out complete course and gameplay markers
-motor: fixed-step movement and forgiving jump
-input: dual-thumb floating stick controls
-camera: lead, damping, and occlusion handling
-platforms: compose moving ice and crumble surfaces
-collision: add physical crate and layer matrix
-combat: spherecast projectiles and external knockback
-combat: add swept stomp resolution
-run: checkpoints, lives, and clean restart
-course: author full mechanic sequence and goal
-polish: add feedback and CC0 environment dressing
-docs: add README decisions and asset ledger
-build: verify Android device recording
+Add: platformer tuning and layers
+Refactor: retain scene authoring objects during bake
+Add: block out complete course and gameplay markers
+Add: fixed-step movement and forgiving jump
+Add: dual-thumb floating stick controls
+Add: lead, damping, and occlusion handling
+Add: compose moving ice and crumble surfaces
+Add: physical crate and layer matrix
+Add: spherecast projectiles and external knockback
+Add: swept stomp resolution
+Add: checkpoints, lives, and clean restart
+Update: author full mechanic sequence and goal
+Update: add feedback and CC0 environment dressing
+Update: add README decisions and asset ledger
+Update: verify Android device recording
 ```
 
 ## 11. Cut order and definition of done

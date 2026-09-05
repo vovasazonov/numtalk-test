@@ -1,0 +1,19 @@
+{
+    "name": "Project.GameDomain.Platforms.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:0e7d38b2337e4c908b42b7a3a4ff5f97",
+        "Arch.Unity"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

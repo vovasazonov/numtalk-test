@@ -1,0 +1,11 @@
+{
+    "name": "Project.GameDomain.ArenaUi.Editor",
+    "references": [
+        "Project.GameDomain.ArenaDomain",
+        "Unity.ugui"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "autoReferenced": true
+}

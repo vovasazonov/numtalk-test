@@ -15,28 +15,33 @@ MonoBehaviour:
   m_GroupName: ComponentListeners
   m_GUID: 84e905497498c4c7e820d8ae815d1b99
   m_SerializeEntries:
-  - m_GUID: 1d41332451feb47f2abb72fbdf157970
-    m_Address: GizmosComponentListener.prefab
+  - m_GUID: 1406b48553ce24be0a32c9611c0b6828
+    m_Address: PushableComponentListener.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 5341da379500a47e9bab56d6d7248e35
-    m_Address: CreatureComponentListener.prefab
+  - m_GUID: 3c3fc54d7bcbb4b7680e34c59ad8cf39
+    m_Address: CharacterBodyComponentListener.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: c625b84f14384469c8686335a6364f6d
-    m_Address: LocationComponentListener.prefab
+  - m_GUID: 52a86c9be38bb488c91c109f5b0e0ffb
+    m_Address: EntityTransformComponentListener.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: d89e8b1c97b984d57a43c2630b72b27f
-    m_Address: PositionComponentListener.prefab
+  - m_GUID: d4297a07a0d30415688a4aad852a80ee
+    m_Address: PhysicsColliderComponentListener.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: f8c5168e750f2450897fce84919ba9e5
-    m_Address: JoystickComponentListener.prefab
+  - m_GUID: f78080f2b2f2547a4b7d6997e2a5d04c
+    m_Address: ShapeComponentListener.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f805f55f1a2044000a163ea90cff509b
+    m_Address: PhysicsBodyComponentListener.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

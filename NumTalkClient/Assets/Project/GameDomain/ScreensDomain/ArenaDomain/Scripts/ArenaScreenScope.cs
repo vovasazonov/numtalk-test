@@ -3,17 +3,9 @@ using Project.CoreDomain.Screen;
 using Project.CoreDomain.VContainer;
 using Project.CoreDomain.View;
 using Project.GameDomain.Features.Configs.Scripts;
-using Project.GameDomain.Features.Creature.Scripts;
 using Project.GameDomain.Features.EcsArchitecture.Scripts;
-using Project.GameDomain.Features.GameInput.Scripts;
-using Project.GameDomain.Features.Input.Scripts;
-using Project.GameDomain.Features.Jump.Scripts;
-using Project.GameDomain.Features.Movement.Scripts;
-using Project.GameDomain.Features.Physics.Scripts;
-using Project.GameDomain.Features.Pickup.Scripts;
-using Project.GameDomain.Features.Player.Scripts;
-using Project.GameDomain.Features.ReapBehindPlayer.Scripts;
-using Project.GameDomain.Features.Reaper.Scripts;
+using Project.GameDomain.ScreensDomain.ArenaDomain.Features.Ui.Scripts;
+using Project.GameDomain.Scripts;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -23,6 +15,8 @@ namespace Project.GameDomain.ScreensDomain.ArenaDomain.Scripts
     public class ArenaScreenScope : LifetimeScope
     {
         [SerializeField] private List<ScriptableInstaller> _installers;
+        [SerializeField] private PlatformerTuningConfig _tuning;
+        [SerializeField] private ArenaHudView _hudView;
 
         protected override void Configure(IContainerBuilder builder)
         {
@@ -32,18 +26,11 @@ namespace Project.GameDomain.ScreensDomain.ArenaDomain.Scripts
             builder.Register<ArenaSceneLoader>(Lifetime.Singleton);
             builder.Register<ViewService>(Lifetime.Singleton).AsImplementedInterfaces();
 
+            builder.RegisterComponent(_hudView).As<IArenaHudView>();
+            builder.RegisterEntryPoint<ArenaHudPresenter>(Lifetime.Singleton);
+
             EcsArchitectureInstaller.Install(builder);
-            ConfigsInstaller.Install(builder);
-            PlayerInstaller.Install(builder);
-            JumpInstaller.Install(builder);
-            MovementInstaller.Install(builder);
-            PhysicsInstaller.Install(builder);
-            CreatureInstaller.Install(builder);
-            ReaperInstaller.Install(builder);
-            ReapBehindPlayerInstaller.Install(builder);
-            PickupInstaller.Install(builder);
-            InputInstaller.Install(builder);
-            GameInputInstaller.Install(builder);
+            GameplaySystemsInstaller.Install(builder, _tuning);
         }
     }
 }
