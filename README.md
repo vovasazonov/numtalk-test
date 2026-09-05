@@ -4,9 +4,9 @@ Mobile-first 3D platformer prototype for the NumTalk Unity Developer Assignment,
 
 ## Preview
 
-[![Skybound gameplay preview](preview.jpg)](preview.mp4)
+[![Skybound animated gameplay preview](preview.gif)](https://github.com/vovasazonov/numtalk-test/blob/master/preview.mp4)
 
-[Watch the gameplay video](preview.mp4).
+Click the animated preview to [watch the full gameplay video with audio](https://github.com/vovasazonov/numtalk-test/blob/master/preview.mp4).
 
 ## Download
 
