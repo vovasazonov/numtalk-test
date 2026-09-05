@@ -146,7 +146,7 @@ namespace Project.GameDomain.Features.Course.Editor
                 var frame = Frame(new Vector3(10, 2, 5), false);
                 view.Present(ref frame);
                 Check(view.Gate.gameObject.activeSelf, "Unused checkpoint invitation missing");
-                Check(Vector3.Distance(view.Gate.position, frame.Position + Vector3.up * 1.1f) < 0.001f, "Gate does not mark trigger center");
+                Check(Vector3.Distance(view.Gate.position, frame.Position + Vector3.up * 1.65f) < 0.001f, "Gate does not mark trigger center");
                 world.Get<CheckpointComponent>(marker).IsActivated = true;
                 view.Present(ref frame);
                 Check(view.Gate.gameObject.activeSelf, "Activation should briefly keep the gate visible");

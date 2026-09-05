@@ -24,13 +24,15 @@ Shader "NumTalk/Checkpoint Gate"
             {
                 float2 p=(i.uv-0.5)*2;
                 float r=length(p);
-                float radius=0.72+_Activation*0.22;
-                float ring=1-smoothstep(0.015,0.065,abs(r-radius));
+                float radius=0.72+_Activation*0.18;
+                float edge=max(fwidth(r),0.002);
+                float ring=1-smoothstep(0.02-edge,0.045+edge,abs(r-radius));
+                ring += exp(-abs(r-radius)*32)*0.22;
                 float ripple=pow(saturate(1-abs(r-frac(_Time.y*0.55))*12),2)*0.23;
                 float angle=atan2(p.y,p.x);
                 float dashes=0.45+0.55*pow(saturate(sin(angle*6+_Time.y*2)),3);
                 float pulse=0.7+0.3*sin(_Time.y*3);
-                float alpha=(ring*dashes*pulse+ripple)*(1-smoothstep(0.85,1,r))*(1-_Activation);
+                float alpha=(ring*dashes*pulse+ripple)*(1-smoothstep(0.94,1,r))*(1-_Activation);
                 return half4(_Tint.rgb*(1+_Activation*2),alpha*_Tint.a);
             }
             ENDHLSL

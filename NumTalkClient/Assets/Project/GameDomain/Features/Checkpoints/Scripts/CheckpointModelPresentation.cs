@@ -31,8 +31,8 @@ namespace Project.GameDomain.Features.Checkpoints.Scripts
             if (Gate != null)
             {
                 Gate.gameObject.SetActive(!checkpoint.IsActivated || _activationTime > 0f);
-                // The flag is offset beside the trigger; the invitation marks the actual walk-through zone.
-                Gate.position = frame.Position + Vector3.up * 1.1f;
+                // Keep the entire ring above the platform, centered within the three-metre trigger.
+                Gate.position = frame.Position + Vector3.up * 1.65f;
                 Gate.rotation = Quaternion.identity;
                 var scale = Gate.parent.lossyScale;
                 Gate.localScale = new Vector3(3.2f / scale.x, 3.2f / scale.y, 1f / scale.z);
