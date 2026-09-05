@@ -14,7 +14,7 @@ namespace Project.GameDomain.Features.PlayerInput.Scripts
     /// and its drag becomes the move vector; the first in the right region holds jump. Each thumb owns its touch id
     /// until that finger lifts, so the two operate concurrently and neither can steal the other's finger.
     /// </summary>
-    public sealed class TouchPlayerInputSource : IPlayerInputSource, System.IDisposable
+    public sealed class TouchPlayerInputService : IPlayerInputSource, System.IDisposable
     {
         private const int NoTouch = 0;
         private const float FallbackScreenDpi = 160f;
@@ -43,7 +43,7 @@ namespace Project.GameDomain.Features.PlayerInput.Scripts
 
         private static float ScreenDpi => Screen.dpi > 0f ? Screen.dpi : FallbackScreenDpi;
 
-        public TouchPlayerInputSource(PlatformerTuningConfig tuning)
+        public TouchPlayerInputService(PlatformerTuningConfig tuning)
         {
             _tuning = tuning;
 

@@ -17,10 +17,10 @@ namespace Project.GameDomain.Features.PlayerInput.Scripts
         [SerializeField] private Image _stickKnob;
         [SerializeField] private Image _jumpMarker;
 
-        private TouchPlayerInputSource _source;
+        private TouchPlayerInputService _source;
 
         [Inject]
-        public void Construct(TouchPlayerInputSource source)
+        public void Construct(TouchPlayerInputService source)
         {
             _source = source;
         }
